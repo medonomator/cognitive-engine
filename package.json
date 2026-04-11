@@ -1,6 +1,25 @@
 {
   "name": "cognitive-engine",
   "private": true,
+  "description": "TypeScript framework for building AI agents with cognitive capabilities",
+  "author": "Dmitry Zorin",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/medonomator/cognitive-engine.git"
+  },
+  "homepage": "https://github.com/medonomator/cognitive-engine",
+  "keywords": [
+    "ai",
+    "agents",
+    "cognitive-architecture",
+    "bdi",
+    "thompson-sampling",
+    "episodic-memory",
+    "perception",
+    "reasoning",
+    "typescript"
+  ],
   "workspaces": [
     "packages/*"
   ],
@@ -8,7 +27,9 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
-    "clean": "turbo run clean"
+    "clean": "turbo run clean",
+    "typecheck": "turbo run build",
+    "test:ci": "vitest run --reporter=verbose"
   },
   "devDependencies": {
     "turbo": "^2.5.0",
