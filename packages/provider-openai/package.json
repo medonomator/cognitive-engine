@@ -1,0 +1,27 @@
+{
+  "name": "@cognitive-engine/provider-openai",
+  "version": "0.1.0",
+  "description": "OpenAI LLM and embedding provider adapters",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@cognitive-engine/core": "workspace:*",
+    "openai": "^4.0.0"
+  },
+  "license": "Apache-2.0"
+}
