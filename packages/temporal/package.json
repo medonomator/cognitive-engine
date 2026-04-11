@@ -31,5 +31,8 @@
     "url": "https://github.com/medonomator/cognitive-engine.git",
     "directory": "packages/temporal"
   },
-  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/temporal"
+  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/temporal",
+  "publishConfig": {
+    "access": "public"
+  }
 }

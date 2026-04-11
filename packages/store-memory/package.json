@@ -32,5 +32,8 @@
     "url": "https://github.com/medonomator/cognitive-engine.git",
     "directory": "packages/store-memory"
   },
-  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/store-memory"
+  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/store-memory",
+  "publishConfig": {
+    "access": "public"
+  }
 }

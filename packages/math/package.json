@@ -28,5 +28,8 @@
     "url": "https://github.com/medonomator/cognitive-engine.git",
     "directory": "packages/math"
   },
-  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/math"
+  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/math",
+  "publishConfig": {
+    "access": "public"
+  }
 }

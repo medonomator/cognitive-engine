@@ -32,5 +32,8 @@
     "url": "https://github.com/medonomator/cognitive-engine.git",
     "directory": "packages/provider-openai"
   },
-  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/provider-openai"
+  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/provider-openai",
+  "publishConfig": {
+    "access": "public"
+  }
 }

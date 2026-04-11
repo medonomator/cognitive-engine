@@ -31,5 +31,8 @@
     "url": "https://github.com/medonomator/cognitive-engine.git",
     "directory": "packages/reasoning"
   },
-  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/reasoning"
+  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/reasoning",
+  "publishConfig": {
+    "access": "public"
+  }
 }
