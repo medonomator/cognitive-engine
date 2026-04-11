@@ -70,3 +70,6 @@ export { CognitiveEventEmitter } from './events.js'
 // Pipeline
 export type { Middleware } from './pipeline.js'
 export { Pipeline } from './pipeline.js'
+
+// Utilities
+export { uid } from './uid.js'

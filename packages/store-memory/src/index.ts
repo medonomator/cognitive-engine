@@ -170,12 +170,16 @@ function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
   return current
 }
 
+function isNumberArray(value: unknown): value is number[] {
+  return Array.isArray(value) && value.every((v) => typeof v === 'number')
+}
+
 function extractVector(data: unknown): number[] | undefined {
   if (typeof data !== 'object' || data === null) return undefined
   const record = data as Record<string, unknown>
   const embedding = record['embedding']
-  if (Array.isArray(embedding)) return embedding as number[]
+  if (isNumberArray(embedding)) return embedding
   const vector = record['vector']
-  if (Array.isArray(vector)) return vector as number[]
+  if (isNumberArray(vector)) return vector
   return undefined
 }

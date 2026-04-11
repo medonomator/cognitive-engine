@@ -12,6 +12,12 @@ import { cosineSimilarity, exponentialDecay } from '@cognitive-engine/math'
 
 const COLLECTION = 'episodes'
 const MS_PER_DAY = 1000 * 60 * 60 * 24
+const ACCESS_BOOST_PER_VIEW = 0.1
+const MAX_ACCESS_BOOST = 0.5
+const CONSOLIDATION_AGE_DAYS = 30
+const FORGOTTEN_THRESHOLD = 0.1
+const MIN_ACCESS_TO_KEEP = 2
+const CONSOLIDATION_DECAY_FACTOR = 0.01
 
 interface ResolvedMemoryConfig {
   decayLambda: number
@@ -64,7 +70,7 @@ export class EpisodicMemory {
   }
 
   /** Store a new episode. */
-  async store_episode(episode: Episode): Promise<void> {
+  async storeEpisode(episode: Episode): Promise<void> {
     await this.store.set(COLLECTION, episode.id, episode)
   }
 
@@ -95,7 +101,7 @@ export class EpisodicMemory {
       const daysSince = (now - ep.occurredAt.getTime()) / MS_PER_DAY
       const recencyScore = exponentialDecay(daysSince, ep.decayFactor)
       const relevanceScore = relevanceScores.get(ep.id) ?? 0.5
-      const accessBoost = Math.min(ep.accessCount * 0.1, 0.5)
+      const accessBoost = Math.min(ep.accessCount * ACCESS_BOOST_PER_VIEW, MAX_ACCESS_BOOST)
       const importanceScore = Math.min(ep.importance + accessBoost, 1)
 
       const combinedScore =
@@ -167,12 +173,12 @@ export class EpisodicMemory {
 
     for (const ep of episodes) {
       const daysSince = (now - ep.occurredAt.getTime()) / MS_PER_DAY
-      if (daysSince < 30) continue // skip recent episodes
+      if (daysSince < CONSOLIDATION_AGE_DAYS) continue
 
       const newImportance =
-        ep.importance * exponentialDecay(daysSince, ep.decayFactor * 0.01)
+        ep.importance * exponentialDecay(daysSince, ep.decayFactor * CONSOLIDATION_DECAY_FACTOR)
 
-      if (newImportance < 0.1 && ep.accessCount < 2) {
+      if (newImportance < FORGOTTEN_THRESHOLD && ep.accessCount < MIN_ACCESS_TO_KEEP) {
         // Forget this episode
         await this.store.delete(COLLECTION, ep.id)
         deletedCount++

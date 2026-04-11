@@ -88,8 +88,9 @@ export class PerceptionService {
         percept,
         beliefCandidates: extractBeliefCandidates(percept),
       }
-    } catch {
+    } catch (error: unknown) {
       // Fallback to quick analysis on LLM failure
+      console.warn('[perception] Deep analysis failed, falling back to quick:', error instanceof Error ? error.message : error)
       const percept: Percept = {
         rawText: text,
         ...quick,

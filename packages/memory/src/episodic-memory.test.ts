@@ -48,7 +48,7 @@ describe('EpisodicMemory', () => {
   describe('store and get', () => {
     it('stores and retrieves an episode', async () => {
       const ep = makeEpisode({ id: 'ep_1' })
-      await memory.store_episode(ep)
+      await memory.storeEpisode(ep)
 
       const retrieved = await memory.get('ep_1')
       expect(retrieved).not.toBeNull()
@@ -76,8 +76,8 @@ describe('EpisodicMemory', () => {
         embedding: [0.5, 0.5, 0],
       })
 
-      await memory.store_episode(recent)
-      await memory.store_episode(old)
+      await memory.storeEpisode(recent)
+      await memory.storeEpisode(old)
 
       const results = await memory.search({
         userId: 'user1',
@@ -95,8 +95,8 @@ describe('EpisodicMemory', () => {
     })
 
     it('filters by category', async () => {
-      await memory.store_episode(makeEpisode({ id: 'work', category: 'work' }))
-      await memory.store_episode(makeEpisode({ id: 'personal', category: 'personal' }))
+      await memory.storeEpisode(makeEpisode({ id: 'work', category: 'work' }))
+      await memory.storeEpisode(makeEpisode({ id: 'personal', category: 'personal' }))
 
       const results = await memory.search({
         userId: 'user1',
@@ -108,8 +108,8 @@ describe('EpisodicMemory', () => {
     })
 
     it('filters by minImportance', async () => {
-      await memory.store_episode(makeEpisode({ id: 'low', importance: 0.1 }))
-      await memory.store_episode(makeEpisode({ id: 'high', importance: 0.9 }))
+      await memory.storeEpisode(makeEpisode({ id: 'low', importance: 0.1 }))
+      await memory.storeEpisode(makeEpisode({ id: 'high', importance: 0.9 }))
 
       const results = await memory.search({
         userId: 'user1',
@@ -128,7 +128,7 @@ describe('EpisodicMemory', () => {
         decayFactor: 0.1, // fast decay
       })
 
-      await memory.store_episode(veryOld)
+      await memory.storeEpisode(veryOld)
 
       const results = await memory.search({
         userId: 'user1',
@@ -142,8 +142,8 @@ describe('EpisodicMemory', () => {
 
   describe('getContext', () => {
     it('returns recent and relevant episodes', async () => {
-      await memory.store_episode(makeEpisode({ id: 'ep1' }))
-      await memory.store_episode(makeEpisode({ id: 'ep2' }))
+      await memory.storeEpisode(makeEpisode({ id: 'ep1' }))
+      await memory.storeEpisode(makeEpisode({ id: 'ep2' }))
 
       const context = await memory.getContext('user1', 'test query')
 
@@ -152,10 +152,10 @@ describe('EpisodicMemory', () => {
     })
 
     it('detects positive emotional pattern', async () => {
-      await memory.store_episode(
+      await memory.storeEpisode(
         makeEpisode({ emotionalValence: 0.8, emotions: ['happy'] }),
       )
-      await memory.store_episode(
+      await memory.storeEpisode(
         makeEpisode({ emotionalValence: 0.6, emotions: ['excited'] }),
       )
 
@@ -172,7 +172,7 @@ describe('EpisodicMemory', () => {
         importance: 0.8,
         accessCount: 5,
       })
-      await memory.store_episode(oldEp)
+      await memory.storeEpisode(oldEp)
 
       const result = await memory.consolidate('user1')
 
@@ -188,7 +188,7 @@ describe('EpisodicMemory', () => {
         accessCount: 0,
         decayFactor: 0.1,
       })
-      await memory.store_episode(forgottenEp)
+      await memory.storeEpisode(forgottenEp)
 
       await memory.consolidate('user1')
 
@@ -199,7 +199,7 @@ describe('EpisodicMemory', () => {
 
   describe('recordAccess', () => {
     it('increments access count', async () => {
-      await memory.store_episode(makeEpisode({ id: 'ep_access', accessCount: 0 }))
+      await memory.storeEpisode(makeEpisode({ id: 'ep_access', accessCount: 0 }))
 
       await memory.recordAccess('ep_access')
 

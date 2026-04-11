@@ -1,4 +1,5 @@
 import type { LlmProvider, Entity } from '@cognitive-engine/core'
+import { clamp } from '@cognitive-engine/math'
 
 export interface DeepAnalysisResult {
   emotionalTone: string
@@ -60,6 +61,3 @@ function normalizeResult(raw: DeepAnalysisResult): DeepAnalysisResult {
   }
 }
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value))
-}

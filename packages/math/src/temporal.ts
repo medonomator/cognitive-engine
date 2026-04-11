@@ -72,3 +72,10 @@ export function binValue(value: number, bins: number[]): number[] {
   }
   return oneHot(idx, size)
 }
+
+/**
+ * Clamp a value to [min, max] range.
+ */
+export function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value))
+}

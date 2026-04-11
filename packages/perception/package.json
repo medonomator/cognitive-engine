@@ -22,7 +22,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@cognitive-engine/core": "*"
+    "@cognitive-engine/core": "*",
+    "@cognitive-engine/math": "*"
   },
   "license": "Apache-2.0",
   "author": "Dmitry Zorin",

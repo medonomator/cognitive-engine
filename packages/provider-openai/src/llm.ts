@@ -45,25 +45,8 @@ export class OpenAiLlmProvider implements LlmProvider {
     messages: LlmMessage[],
     options?: LlmOptions,
   ): Promise<LlmResponse> {
-    const model = options?.model ?? this.model
-    const reasoning = isReasoningModel(model)
-
-    const params: OpenAI.ChatCompletionCreateParams = {
-      model,
-      messages: this.toOpenAiMessages(messages, reasoning),
-    }
-
-    if (reasoning) {
-      params.max_completion_tokens = Math.max(
-        (options?.maxTokens ?? this.defaultMaxTokens) * 10,
-        2000,
-      )
-    } else {
-      params.temperature = options?.temperature ?? this.defaultTemperature
-      params.max_tokens = options?.maxTokens ?? this.defaultMaxTokens
-    }
-
-    const response = await this.client.chat.completions.create(params)
+    const params = this.buildParams(messages, options)
+    const response = await this.client.chat.completions.create(params) as OpenAI.ChatCompletion
     return this.toResponse(response)
   }
 
@@ -71,13 +54,33 @@ export class OpenAiLlmProvider implements LlmProvider {
     messages: LlmMessage[],
     options?: LlmOptions,
   ): Promise<LlmResponse & { parsed: T }> {
+    const params = this.buildParams(messages, options)
+    params.response_format = { type: 'json_object' }
+
+    const response = await this.client.chat.completions.create(params) as OpenAI.ChatCompletion
+    const base = this.toResponse(response)
+
+    let parsed: T
+    try {
+      parsed = JSON.parse(base.content) as T
+    } catch {
+      throw new Error(
+        `LLM returned invalid JSON: ${base.content.substring(0, 200)}`,
+      )
+    }
+    return { ...base, parsed }
+  }
+
+  private buildParams(
+    messages: LlmMessage[],
+    options?: LlmOptions,
+  ): OpenAI.ChatCompletionCreateParams {
     const model = options?.model ?? this.model
     const reasoning = isReasoningModel(model)
 
     const params: OpenAI.ChatCompletionCreateParams = {
       model,
       messages: this.toOpenAiMessages(messages, reasoning),
-      response_format: { type: 'json_object' },
     }
 
     if (reasoning) {
@@ -90,11 +93,7 @@ export class OpenAiLlmProvider implements LlmProvider {
       params.max_tokens = options?.maxTokens ?? this.defaultMaxTokens
     }
 
-    const response = await this.client.chat.completions.create(params)
-    const base = this.toResponse(response)
-
-    const parsed = JSON.parse(base.content) as T
-    return { ...base, parsed }
+    return params
   }
 
   private toOpenAiMessages(
@@ -109,9 +108,7 @@ export class OpenAiLlmProvider implements LlmProvider {
     })
   }
 
-  private toResponse(
-    response: OpenAI.ChatCompletion,
-  ): LlmResponse {
+  private toResponse(response: OpenAI.ChatCompletion): LlmResponse {
     const choice = response.choices[0]
     const content = choice?.message?.content ?? ''
     const usage = response.usage

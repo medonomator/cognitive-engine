@@ -1,14 +1,10 @@
+import { uid } from '@cognitive-engine/core'
 import type { Belief, BeliefSource, BeliefCandidate } from '@cognitive-engine/core'
 
 const SOURCE_WEIGHTS: Record<BeliefSource, number> = {
   explicit: 0.9,
   observed: 0.6,
   inferred: 0.4,
-}
-
-let beliefCounter = 0
-function generateBeliefId(): string {
-  return `belief_${Date.now()}_${++beliefCounter}`
 }
 
 /**
@@ -69,7 +65,7 @@ export class WorldModel {
 
     const now = new Date()
     const belief: Belief = {
-      id: generateBeliefId(),
+      id: uid('belief'),
       subject: candidate.subject,
       predicate: candidate.predicate,
       object: candidate.object,

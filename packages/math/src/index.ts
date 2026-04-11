@@ -27,4 +27,5 @@ export {
   timeDecayWeights,
   oneHot,
   binValue,
+  clamp,
 } from './temporal.js'

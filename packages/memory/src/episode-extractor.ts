@@ -1,8 +1,10 @@
+import { uid } from '@cognitive-engine/core'
 import type {
   LlmProvider,
   EmbeddingProvider,
   Episode,
 } from '@cognitive-engine/core'
+import { clamp } from '@cognitive-engine/math'
 
 interface ExtractionResult {
   hasEpisode: boolean
@@ -36,11 +38,6 @@ Respond ONLY with valid JSON (no markdown, no code blocks):
 }
 
 If the message is not a personal episode (greetings, questions, commands), set hasEpisode=false and leave other fields with defaults.`
-
-let idCounter = 0
-function generateId(): string {
-  return `ep_${Date.now()}_${++idCounter}`
-}
 
 /**
  * Extracts episodic memories from user messages using LLM analysis.
@@ -77,7 +74,7 @@ export class EpisodeExtractor {
     )
 
     return {
-      id: generateId(),
+      id: uid('ep'),
       userId,
       summary: result.summary ?? '',
       details: result.details ?? '',
@@ -99,6 +96,3 @@ export class EpisodeExtractor {
   }
 }
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value))
-}
