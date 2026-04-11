@@ -1,0 +1,54 @@
+{
+  "name": "@cognitive-engine/engine",
+  "version": "0.1.0",
+  "description": "TypeScript framework for building AI agents with cognitive capabilities — perception, memory, reasoning, and adaptive learning",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@cognitive-engine/core": "*",
+    "@cognitive-engine/math": "*",
+    "@cognitive-engine/store-memory": "*",
+    "@cognitive-engine/provider-openai": "*",
+    "@cognitive-engine/perception": "*",
+    "@cognitive-engine/bandit": "*",
+    "@cognitive-engine/memory": "*",
+    "@cognitive-engine/reasoning": "*"
+  },
+  "license": "Apache-2.0",
+  "author": "Dmitry Zorin",
+  "keywords": [
+    "ai",
+    "agents",
+    "cognitive-architecture",
+    "bdi",
+    "thompson-sampling",
+    "episodic-memory",
+    "perception",
+    "reasoning",
+    "typescript",
+    "openai"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/medonomator/cognitive-engine.git",
+    "directory": "packages/cognitive-engine"
+  },
+  "homepage": "https://github.com/medonomator/cognitive-engine",
+  "publishConfig": {
+    "access": "public"
+  }
+}
