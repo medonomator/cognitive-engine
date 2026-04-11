@@ -11,7 +11,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
@@ -22,5 +24,12 @@
   "dependencies": {
     "@cognitive-engine/core": "*"
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "author": "Dmitry Zorin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/medonomator/cognitive-engine.git",
+    "directory": "packages/reasoning"
+  },
+  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/reasoning"
 }
