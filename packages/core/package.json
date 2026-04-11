@@ -20,7 +20,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@cognitive-engine/math": "workspace:*"
+    "@cognitive-engine/math": "*"
   },
   "license": "Apache-2.0"
 }
