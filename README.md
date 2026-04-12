@@ -2,9 +2,9 @@
 
 > Not just memory. A mind.
 
-Pure TypeScript framework for building AI agents with real cognitive capabilities — perception, episodic memory, BDI reasoning, Thompson Sampling, and adaptive personalization.
+Pure TypeScript library for building AI agents with real cognitive capabilities — perception, memory, reasoning, emotions, social awareness, and adaptive learning.
 
-**Provider-agnostic**: works with any LLM (OpenAI, Anthropic, local models) and any storage backend.
+**Provider-agnostic**: works with any LLM and any storage backend via simple interfaces.
 
 ## Install
 
@@ -12,273 +12,180 @@ Pure TypeScript framework for building AI agents with real cognitive capabilitie
 npm install cognitive-engine
 ```
 
+Or use individual packages:
+
+```bash
+npm install @cognitive-engine/perception @cognitive-engine/bandit
+```
+
 ## What It Does
 
-Most AI frameworks just wrap API calls. Cognitive Engine gives your agent actual cognitive abilities:
+Most AI libraries just wrap API calls. Cognitive Engine gives your agent actual cognitive abilities:
 
-- **Perception** — Understands user messages beyond keywords: emotions, urgency, implicit needs, conversation phase
-- **Episodic Memory** — Remembers past interactions with semantic search, importance scoring, and natural forgetting
-- **BDI Reasoning** — Beliefs-Desires-Intentions architecture for deciding *what* to do and *why*
-- **Adaptive Learning** — Thompson Sampling bandit that learns which response strategies work best per user
+| Module | What it does |
+|--------|-------------|
+| **Perception** | Dual-mode message analysis — emotions, urgency, intent, entities |
+| **Reasoning** | BDI (Beliefs-Desires-Intentions) with Bayesian belief updates |
+| **Episodic Memory** | Store & recall interactions with semantic search and natural forgetting |
+| **Semantic Memory** | Knowledge graph of facts with confidence tracking |
+| **Emotional Model** | VAD (Valence-Arousal-Dominance) tracking, volatility detection |
+| **Social Model** | Rapport, boundaries, communication preferences |
+| **Mind** | Self-reflection, relationship tracking, open loops |
+| **Temporal** | Behavior patterns, causal chains, predictions |
+| **Planning** | Goal decomposition and plan tracking |
+| **Metacognition** | Self-assessment, contradiction detection, strategy selection |
+| **Bandit** | Thompson Sampling — learns what works per user |
+| **Orchestrator** | Composes all modules into a single `process()` call |
 
 ## Quick Start
 
+### Full orchestrator (all modules)
+
 ```typescript
 import {
+  CognitiveOrchestrator,
   OpenAiLlmProvider,
   OpenAiEmbeddingProvider,
-  PerceptionService,
-  Reasoner,
-  EpisodicMemory,
-  EpisodeExtractor,
-  ThompsonBandit,
-  MemoryBanditStorage,
   MemoryStore,
 } from 'cognitive-engine'
 
-// 1. Set up providers
-const llm = new OpenAiLlmProvider({
-  apiKey: process.env.OPENAI_API_KEY,
-  model: 'gpt-4o-mini',
+const engine = new CognitiveOrchestrator({
+  llm: new OpenAiLlmProvider({ apiKey: process.env.OPENAI_API_KEY, model: 'gpt-4o-mini' }),
+  embedding: new OpenAiEmbeddingProvider({ apiKey: process.env.OPENAI_API_KEY }),
+  store: new MemoryStore(),
 })
-const embedding = new OpenAiEmbeddingProvider({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-const store = new MemoryStore()
 
-// 2. Create cognitive modules
-const perception = new PerceptionService(llm)
-const reasoner = new Reasoner()
-const memory = new EpisodicMemory(store, embedding)
-const extractor = new EpisodeExtractor(llm, embedding)
-const bandit = new ThompsonBandit(new MemoryBanditStorage())
+const result = await engine.process('user-123', 'I feel stuck on this project')
+
+console.log(result.percept.emotionalTone)          // 'frustrated'
+console.log(result.reasoning.intentions[0].type)    // 'empathize'
+console.log(result.suggestedResponse)               // AI-generated empathetic response
 ```
 
-## Usage Examples
+### Selective modules
 
-### Perception — Understand User Messages
+```typescript
+const engine = new CognitiveOrchestrator({
+  llm, embedding, store,
+  modules: {
+    memory: true,
+    emotional: true,
+    // everything else disabled — zero overhead
+  },
+})
+```
 
-Dual-mode analysis: fast regex for simple messages, deep LLM analysis for complex ones.
+### Individual modules (no orchestrator)
+
+```typescript
+import { PerceptionService } from 'cognitive-engine'
+
+const perception = new PerceptionService(llm)
+const { percept } = await perception.perceive('Can you help me fix this bug?')
+console.log(percept.requestType)  // 'question'
+console.log(percept.urgency)      // 4
+```
+
+## Module Examples
+
+### Perception — Understand Messages
 
 ```typescript
 const { percept, beliefCandidates } = await perception.perceive(
-  "I've been stressed about the project deadline, my manager keeps adding tasks"
+  "I've been stressed about the deadline, my manager keeps adding tasks"
 )
 
-console.log(percept.emotionalTone)   // 'anxious'
-console.log(percept.urgency)          // 7
-console.log(percept.responseMode)     // 'listening'
-console.log(percept.implicitNeeds)    // ['emotional_support', 'validation']
-console.log(percept.entities)         // [{ type: 'person', value: 'manager' }]
-console.log(percept.conversationPhase) // 'sharing'
-```
-
-Quick analysis (no LLM call, instant):
-
-```typescript
-import { quickAnalyze } from 'cognitive-engine'
-
-const quick = quickAnalyze("Can you help me fix this bug?")
-console.log(quick.requestTypes) // ['question', 'help']
-console.log(quick.urgency)     // 4
+percept.emotionalTone    // 'anxious'
+percept.urgency          // 7
+percept.responseMode     // 'listening'
+percept.implicitNeeds    // ['emotional_support', 'validation']
+percept.entities         // [{ type: 'person', value: 'manager' }]
 ```
 
 ### Reasoning — Decide What To Do
 
-BDI (Beliefs-Desires-Intentions) reasoning with Bayesian belief updates.
-
 ```typescript
-// Feed perception results into the world model
-for (const candidate of beliefCandidates) {
-  reasoner.worldModel.addBelief(candidate, 'observed')
-}
-
-// Reason about the situation
 const result = reasoner.reason(percept)
 
-console.log(result.intentions)
+result.intentions
 // [
-//   { type: 'empathize', priority: 10, reason: 'User is stressed, listening mode' },
-//   { type: 'explore', priority: 5, reason: 'Understand workload situation' }
-// ]
-
-console.log(result.state.beliefs)
-// [
-//   { subject: 'user', predicate: 'feels', object: 'stressed', confidence: 0.85 },
-//   { subject: 'user', predicate: 'deals_with', object: 'work_pressure', confidence: 0.7 }
+//   { type: 'empathize', priority: 10, reason: 'User is stressed' },
+//   { type: 'explore', priority: 5, reason: 'Understand workload' }
 // ]
 ```
 
-World model maintains beliefs with confidence that updates over time:
+### Memory — Remember and Recall
 
 ```typescript
-const { worldModel } = reasoner
+// Store episodes
+const episode = await extractor.extract('user-123', message)
+await memory.storeEpisode(episode)
 
-// Explicit statement → high confidence
-worldModel.addBelief(
-  { subject: 'user', predicate: 'works_as', object: 'engineer', confidence: 0.9 },
-  'explicit'
-)
+// Semantic search
+const results = await memory.search({ userId: 'user-123', query: 'team collaboration' })
 
-// Repeated evidence strengthens beliefs
-worldModel.confirmBelief(beliefId) // confidence: 0.85 → 0.95
-
-// Contradicting evidence weakens them
-worldModel.weakenBelief(beliefId) // confidence: 0.6 → 0.45
-
-// Inferred beliefs decay faster than explicit ones
-worldModel.applyDecay()
+// Build context for response
+const context = await memory.getContext('user-123', 'How is the project going?')
 ```
 
-### Episodic Memory — Remember and Recall
-
-Store personal episodes with semantic search and natural forgetting.
+### Bandit — Learn What Works
 
 ```typescript
-// Extract episodes from user messages automatically
-const episode = await extractor.extract(
-  'user-123',
-  'Yesterday I had a great meeting with the team, we finally agreed on the architecture'
-)
+const bandit = new ThompsonBandit(new MemoryBanditStorage())
 
-if (episode) {
-  console.log(episode.summary)     // 'Productive team meeting about architecture'
-  console.log(episode.emotions)    // ['satisfaction', 'relief']
-  console.log(episode.importance)  // 0.7
-  console.log(episode.category)   // 'work'
+// Select best strategy for this context
+const choice = await bandit.select(contextVector, ['empathetic', 'actionable', 'curious'])
+// choice.action = 'empathetic', choice.expectedReward = 0.73
 
-  await memory.storeEpisode(episode)
-}
+// After user feedback, update
+await bandit.update(choice.action, contextVector, 1.0)
+// Over time: learns per-context preferences
+```
 
-// Semantic search — find relevant memories
-const results = await memory.search({
-  userId: 'user-123',
-  query: 'team collaboration',
-  limit: 5,
+### Events — React to Cognitive Activity
+
+```typescript
+import { CognitiveEventEmitter, CognitiveOrchestrator } from 'cognitive-engine'
+
+const events = new CognitiveEventEmitter()
+events.on('perception:complete', (percept) => {
+  analytics.track('perception', { tone: percept.emotionalTone })
+})
+events.on('episode:created', (episode) => {
+  console.log('Remembered:', episode.summary)
 })
 
-for (const result of results) {
-  console.log(result.episode.summary)
-  console.log(result.relevanceScore)  // semantic similarity
-  console.log(result.recencyScore)    // time decay
-  console.log(result.combinedScore)   // weighted combination
-}
-
-// Build context for response generation
-const context = await memory.getContext('user-123', 'How is the project going?')
-console.log(context.recentEpisodes)    // last 5 episodes
-console.log(context.relevantEpisodes)  // semantically related
-console.log(context.emotionalPattern)  // 'positive (satisfaction)'
-
-// Consolidation — forget old unimportant memories
-const consolidated = await memory.consolidate('user-123')
-console.log(consolidated.decayedCount)    // importance reduced
-console.log(consolidated.deletedCount)    // forgotten
-console.log(consolidated.remainingCount)  // still remembered
+const engine = new CognitiveOrchestrator({ llm, embedding, store, events })
 ```
 
-### Adaptive Learning — Thompson Sampling Bandit
+## Custom Providers
 
-Learn which response strategies work best for each user context.
-
-```typescript
-// Initialize response strategies with context dimensions
-const contextDim = 3 // e.g., [urgency, emotionIntensity, messageLength]
-await bandit.initAction('empathetic', contextDim)
-await bandit.initAction('actionable', contextDim)
-await bandit.initAction('curious', contextDim)
-
-// Select best strategy based on current context
-const context = [0.8, 0.6, 0.3] // high urgency, medium emotion, short message
-const choice = await bandit.select(context, ['empathetic', 'actionable', 'curious'])
-console.log(choice.action)         // 'empathetic'
-console.log(choice.expectedReward) // 0.73
-
-// After getting user feedback, update the model
-await bandit.update(choice.action, context, 1.0) // positive feedback
-
-// Over time, the bandit learns per-context preferences
-// High urgency + high emotion → empathetic works best
-// Low urgency + question → actionable works best
-```
-
-### Custom Providers — Bring Your Own LLM/Storage
-
-Implement the interfaces to use any LLM or storage backend:
+Implement interfaces to use any LLM or storage:
 
 ```typescript
 import type { LlmProvider, Store, EmbeddingProvider } from 'cognitive-engine'
 
-// Custom LLM (e.g., Anthropic, Ollama, etc.)
+// Your LLM (Anthropic, Ollama, Gemini, etc.)
 class MyLlmProvider implements LlmProvider {
   async complete(messages, options?) {
-    // Call your LLM API
-    return { content: '...', usage: { ... }, finishReason: 'stop' }
+    return { content: '...', usage: { promptTokens: 0, completionTokens: 0 }, finishReason: 'stop' }
   }
-
   async completeJson(messages, options?) {
-    // Call your LLM API with JSON mode
     const response = await this.complete(messages, options)
     return { ...response, parsed: JSON.parse(response.content) }
   }
 }
 
-// Custom Store (e.g., PostgreSQL, Redis, MongoDB)
+// Your Store (PostgreSQL, Redis, MongoDB, etc.)
 class PostgresStore implements Store {
   async get(collection, id) { /* SELECT ... */ }
   async set(collection, id, data) { /* INSERT/UPDATE ... */ }
   async delete(collection, id) { /* DELETE ... */ }
   async find(collection, filter) { /* SELECT ... WHERE ... */ }
   async upsert(collection, id, data) { /* INSERT ... ON CONFLICT ... */ }
-  async vectorSearch(collection, vector, options) { /* pgvector search */ }
+  // Optional: vector search with pgvector
+  async vectorSearch(collection, vector, options) { /* ORDER BY embedding <-> $1 */ }
 }
-
-// Custom Embedding Provider
-class MyEmbeddingProvider implements EmbeddingProvider {
-  async embed(text) { return [0.1, 0.2, ...] }
-  async embedBatch(texts) { return texts.map(t => [0.1, ...]) }
-}
-```
-
-### Pipeline — Composable Processing
-
-Chain processing steps with type-safe pipelines:
-
-```typescript
-import { Pipeline } from 'cognitive-engine'
-
-const pipeline = new Pipeline<string, string>()
-  .pipe(async (input) => input.toLowerCase())
-  .pipe(async (input) => input.trim())
-  .pipe(async (input) => `processed: ${input}`)
-
-const result = await pipeline.execute('  Hello World  ')
-// 'processed: hello world'
-```
-
-### Math Utilities
-
-Battle-tested math functions used internally, available for your own use:
-
-```typescript
-import {
-  cosineSimilarity,
-  exponentialDecay,
-  sampleDiagonalMVN,
-  l2Normalize,
-} from 'cognitive-engine'
-
-// Vector similarity
-const sim = cosineSimilarity([1, 2, 3], [2, 4, 6]) // 1.0
-
-// Time-based decay (for memory, belief confidence)
-const weight = exponentialDecay(daysSinceEvent, decayRate) // 0.0–1.0
-
-// Thompson Sampling (diagonal MVN — O(n) per sample)
-const sample = sampleDiagonalMVN(mean, variance) // [0.3, 0.7, ...]
-
-// Normalize vectors for cosine similarity
-const normalized = l2Normalize([3, 4]) // [0.6, 0.8]
 ```
 
 ## Architecture
@@ -287,40 +194,72 @@ const normalized = l2Normalize([3, 4]) // [0.6, 0.8]
 User Message
      │
      ▼
-┌─────────────┐
-│  Perception  │  Dual-mode: regex (fast) + LLM (deep)
-│  → Percept   │  Emotion, intent, entities, implicit needs
-└──────┬──────┘
+┌──────────────┐
+│  Perception   │  Dual-mode: regex (fast) + LLM (deep)
+└──────┬───────┘
        │
-       ▼
-┌─────────────┐     ┌──────────────┐
-│  Reasoning   │◄────│  World Model  │  Bayesian belief updates
-│  → Intentions│     │  (Beliefs)    │  Confidence decay
-└──────┬──────┘     └──────────────┘
-       │
-       ├──────────────────────────┐
-       ▼                          ▼
-┌─────────────┐          ┌──────────────┐
-│   Memory     │          │    Bandit     │
-│  (Episodes)  │          │  (Thompson)  │
-│  Semantic    │          │  Adaptive    │
-│  search +    │          │  O(n) diag   │
-│  decay       │          │  covariance  │
-└─────────────┘          └──────────────┘
+  ┌────┴────┐
+  ▼         ▼
+┌────┐   ┌────────┐
+│ Memory   │ Reason │  Parallel execution
+│ (episodic│ (BDI)  │
+│ +semantic│        │
+└────┬─────┘────┬───┘
+     │          │
+     ▼          ▼
+┌─────────────────────────────────────┐
+│  Mind / Emotional / Social / Plan   │  Parallel
+│  Temporal / Bandit                  │
+└──────────────┬──────────────────────┘
+               │
+               ▼
+┌──────────────────────┐
+│  Metacognition       │  Self-assessment
+│  → Strategy selection│
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  Response Generation  │  System prompt + LLM
+└──────────────────────┘
 ```
 
-## Key Design Decisions
+## Packages
 
-- **Pure TypeScript** — no framework lock-in (NestJS, Express, etc.). Use anywhere.
-- **Provider-agnostic** — swap LLM, embedding, or storage via simple interfaces.
-- **Math-first** — real algorithms (Thompson Sampling, Bayesian updates, cosine similarity), not just API wrappers.
-- **Strict types** — `strict: true`, `noUncheckedIndexedAccess`, zero `any` casts.
-- **168 tests** — every module tested, including convergence tests for bandit algorithms.
+All packages work standalone. Use only what you need.
+
+| Package | Description |
+|---------|-------------|
+| `cognitive-engine` | Umbrella — re-exports everything |
+| `@cognitive-engine/core` | Types, interfaces, event system |
+| `@cognitive-engine/math` | Vector ops, statistics, sampling |
+| `@cognitive-engine/perception` | Message analysis |
+| `@cognitive-engine/reasoning` | BDI inference engine |
+| `@cognitive-engine/memory` | Episodic + semantic memory |
+| `@cognitive-engine/emotional` | VAD emotional model |
+| `@cognitive-engine/social` | Rapport, boundaries, preferences |
+| `@cognitive-engine/mind` | Reflection, relationships, open loops |
+| `@cognitive-engine/temporal` | Patterns, causal chains, predictions |
+| `@cognitive-engine/planning` | Goal decomposition |
+| `@cognitive-engine/metacognition` | Self-assessment |
+| `@cognitive-engine/bandit` | Thompson Sampling |
+| `@cognitive-engine/orchestrator` | Full cognitive pipeline |
+| `@cognitive-engine/store-memory` | In-memory store (dev/test) |
+| `@cognitive-engine/provider-openai` | OpenAI LLM + embeddings |
+
+## Design Principles
+
+- **Library, not framework** — you call it, it doesn't call you. Compose freely.
+- **Provider-agnostic** — swap LLM, embeddings, or storage via interfaces.
+- **Each module works standalone** — no hidden coupling between packages.
+- **Math-first** — real algorithms (Thompson Sampling, Bayesian updates, VAD model), not API wrappers.
+- **Strict TypeScript** — `strict: true`, zero `any` casts, all interfaces extracted.
+- **315+ tests** — every module tested, including convergence tests for bandit.
 
 ## Requirements
 
-- Node.js ≥ 20
-- TypeScript ≥ 5.0 (for consumers using TypeScript)
+- Node.js >= 20
+- TypeScript >= 5.0
 
 ## License
 
