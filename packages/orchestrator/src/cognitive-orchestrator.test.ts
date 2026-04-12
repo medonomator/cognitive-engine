@@ -314,4 +314,54 @@ describe('CognitiveOrchestrator', () => {
     orchestrator.on('perception:complete', handler)
     orchestrator.off('perception:complete', handler)
   })
+
+  it('continues processing when non-critical modules fail', async () => {
+    const errorHandler = vi.fn()
+    const config = createConfig()
+    config.onError = errorHandler
+
+    const orchestrator = new CognitiveOrchestrator(config)
+
+    // Break the store — simulates DB/embedding failure
+    const brokenStore = orchestrator.episodicMemory!
+    vi.spyOn(brokenStore, 'getContext').mockRejectedValue(new Error('store unavailable'))
+
+    const response = await orchestrator.process('user1', 'Hello despite failures')
+
+    // Pipeline completed — we got a response
+    expect(response.suggestedResponse).toBe('This is a suggested response.')
+    expect(response.percept.rawText).toBe('Hello despite failures')
+    expect(response.reasoning).toBeDefined()
+
+    // Failed context is undefined, not an exception
+    expect(response.episodicContext).toBeUndefined()
+
+    // Error was reported, not swallowed
+    expect(errorHandler).toHaveBeenCalledWith(
+      expect.any(Error),
+      'episodicMemory.getContext',
+    )
+  })
+
+  it('reports all failures from parallel non-critical modules', async () => {
+    const errorHandler = vi.fn()
+    const config = createConfig()
+    config.onError = errorHandler
+
+    const orchestrator = new CognitiveOrchestrator(config)
+
+    // Break multiple non-critical modules
+    vi.spyOn(orchestrator.mind!, 'process').mockRejectedValue(new Error('mind failed'))
+    vi.spyOn(orchestrator.emotional!, 'update').mockRejectedValue(new Error('emotional failed'))
+
+    const response = await orchestrator.process('user1', 'Still works')
+
+    // Pipeline completed
+    expect(response.suggestedResponse).toBeDefined()
+
+    // Both errors reported
+    const errorContexts = errorHandler.mock.calls.map((call) => call[1])
+    expect(errorContexts).toContain('mind.process')
+    expect(errorContexts).toContain('emotional.update')
+  })
 })

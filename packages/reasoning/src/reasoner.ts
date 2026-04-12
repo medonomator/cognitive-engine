@@ -22,8 +22,15 @@ const MAX_CONFLICTING_INTENTIONS = 3
 const MIN_BELIEFS_FOR_CONTEXT = 3
 const TARGET_PREVIEW_LENGTH = 50
 
+interface UserReasoningState {
+  worldModel: WorldModel
+  workingMemory: WorkingMemory
+}
+
 /**
  * BDI Reasoning Engine.
+ *
+ * Maintains per-user state (beliefs + working memory).
  *
  * Orchestrates the reasoning loop:
  * 1. Update working memory from percept
@@ -33,23 +40,24 @@ const TARGET_PREVIEW_LENGTH = 50
  * 5. Calculate confidence
  */
 export class Reasoner {
-  readonly worldModel: WorldModel
-  readonly workingMemory: WorkingMemory
+  private readonly users = new Map<string, UserReasoningState>()
+  private readonly maxWorkingMemory: number
   private readonly customRules: InferenceRule[]
 
   constructor(config: ReasoningConfig = {}) {
-    this.worldModel = new WorldModel()
-    this.workingMemory = new WorkingMemory(config.maxWorkingMemory ?? DEFAULT_MAX_WORKING_MEMORY)
+    this.maxWorkingMemory = config.maxWorkingMemory ?? DEFAULT_MAX_WORKING_MEMORY
     this.customRules = config.customRules ?? []
   }
 
   /**
    * Main reasoning loop: perceive → reason → decide.
    */
-  reason(percept: Percept): ReasoningResult {
-    this.workingMemory.update(percept)
-    const newBeliefs = this.inferBeliefs(percept)
-    const state = this.buildCognitiveState(percept)
+  reason(userId: string, percept: Percept): ReasoningResult {
+    const { worldModel, workingMemory } = this.getOrCreateState(userId)
+
+    workingMemory.update(percept)
+    const newBeliefs = this.inferBeliefs(worldModel, percept)
+    const state = this.buildCognitiveState(worldModel, workingMemory, percept)
     const intentions = generateIntentions(percept, state)
 
     return {
@@ -62,12 +70,23 @@ export class Reasoner {
     }
   }
 
-  /** Get current cognitive state snapshot. */
-  getState(): CognitiveState {
+  /** Get per-user world model. Creates if not exists. */
+  getWorldModel(userId: string): WorldModel {
+    return this.getOrCreateState(userId).worldModel
+  }
+
+  /** Get per-user working memory. Creates if not exists. */
+  getWorkingMemory(userId: string): WorkingMemory {
+    return this.getOrCreateState(userId).workingMemory
+  }
+
+  /** Get current cognitive state snapshot for a user. */
+  getState(userId: string): CognitiveState {
+    const { worldModel, workingMemory } = this.getOrCreateState(userId)
     return {
-      beliefs: this.worldModel.getBeliefs(),
+      beliefs: worldModel.getBeliefs(),
       goals: [],
-      workingMemory: this.workingMemory.getItems(),
+      workingMemory: workingMemory.getItems(),
       currentIntentions: [],
       emotionalContext: '',
       attentionFocus: [],
@@ -75,17 +94,43 @@ export class Reasoner {
     }
   }
 
-  private inferBeliefs(percept: Percept): Belief[] {
-    const beliefs = this.worldModel.getBeliefs()
-    const candidates = applyInferenceRules(percept, beliefs, this.customRules)
-    return candidates.map((c) => this.worldModel.addBelief(c, 'inferred'))
+  /** Remove all state for a user. */
+  clearUser(userId: string): void {
+    this.users.delete(userId)
   }
 
-  private buildCognitiveState(percept: Percept): CognitiveState {
+  /** Remove all user state. */
+  clear(): void {
+    this.users.clear()
+  }
+
+  private getOrCreateState(userId: string): UserReasoningState {
+    let state = this.users.get(userId)
+    if (!state) {
+      state = {
+        worldModel: new WorldModel(),
+        workingMemory: new WorkingMemory(this.maxWorkingMemory),
+      }
+      this.users.set(userId, state)
+    }
+    return state
+  }
+
+  private inferBeliefs(worldModel: WorldModel, percept: Percept): Belief[] {
+    const beliefs = worldModel.getBeliefs()
+    const candidates = applyInferenceRules(percept, beliefs, this.customRules)
+    return candidates.map((c) => worldModel.addBelief(c, 'inferred'))
+  }
+
+  private buildCognitiveState(
+    worldModel: WorldModel,
+    workingMemory: WorkingMemory,
+    percept: Percept,
+  ): CognitiveState {
     return {
-      beliefs: this.worldModel.getBeliefs(),
+      beliefs: worldModel.getBeliefs(),
       goals: [],
-      workingMemory: this.workingMemory.getItems(),
+      workingMemory: workingMemory.getItems(),
       currentIntentions: [],
       emotionalContext: percept.emotionalTone,
       attentionFocus: percept.entities.map((e) => e.value),

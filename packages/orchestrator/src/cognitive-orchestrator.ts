@@ -181,84 +181,112 @@ export class CognitiveOrchestrator {
       const percept = perceptionResult.percept
       this.events?.emit('perception:complete', percept)
 
-      // ── Step 2: Remember (parallel) ──
+      // ── Step 2: Remember (parallel, non-critical) ──
       let episodicContext: EpisodicContext | undefined
       let semanticContext: SemanticContext | undefined
 
       if (this.episodicMemory && this.semanticMemory) {
-        const [ec, sc] = await Promise.all([
+        const [ecResult, scResult] = await Promise.allSettled([
           this.episodicMemory.getContext(userId, message),
           this.semanticMemory.getContext(userId, message),
         ])
-        episodicContext = ec
-        semanticContext = sc
+        episodicContext = this.unwrapSettled(ecResult, 'episodicMemory.getContext')
+        semanticContext = this.unwrapSettled(scResult, 'semanticMemory.getContext')
       }
 
       // ── Step 3: Reason ──
-      const reasoning = this.reasoning.reason(percept)
+      const reasoning = this.reasoning.reason(userId, percept)
 
-      // ── Step 4-7: Reflect, Feel, Socialize, Plan (parallel) ──
-      const parallelUpdates: Promise<unknown>[] = []
+      // ── Step 4-7: Reflect, Feel, Socialize, Plan (parallel, non-critical) ──
+      const parallelUpdates: Array<{ promise: Promise<unknown>; context: string }> = []
 
       if (this.mind) {
         const recentEpisodes = episodicContext?.recentEpisodes ?? []
-        parallelUpdates.push(
-          this.mind.process(userId, message, percept, recentEpisodes),
-        )
+        parallelUpdates.push({
+          promise: this.mind.process(userId, message, percept, recentEpisodes),
+          context: 'mind.process',
+        })
       }
       if (this.emotional) {
-        parallelUpdates.push(this.emotional.update(userId, percept))
+        parallelUpdates.push({
+          promise: this.emotional.update(userId, percept),
+          context: 'emotional.update',
+        })
       }
       if (this.social) {
-        parallelUpdates.push(this.social.process(userId, message, percept))
+        parallelUpdates.push({
+          promise: this.social.process(userId, message, percept),
+          context: 'social.process',
+        })
       }
       if (this.planner) {
-        parallelUpdates.push(this.planner.detectAndCreate(userId, message))
+        parallelUpdates.push({
+          promise: this.planner.detectAndCreate(userId, message),
+          context: 'planner.detectAndCreate',
+        })
       }
 
       if (parallelUpdates.length > 0) {
-        await Promise.all(parallelUpdates)
+        const results = await Promise.allSettled(
+          parallelUpdates.map((u) => u.promise),
+        )
+        for (let i = 0; i < results.length; i++) {
+          this.unwrapSettled(results[i]!, parallelUpdates[i]!.context)
+        }
       }
 
-      // ── Gather contexts (parallel) ──
+      // ── Gather contexts (parallel, non-critical) ──
       let mindContext: MindContext | undefined
       let emotionalContext: EmotionalContext | undefined
       let socialContext: SocialContext | undefined
       let planningContext: PlanningContext | undefined
 
-      const contextPromises: Promise<void>[] = []
+      const contextEntries: Array<{ promise: Promise<unknown>; context: string }> = []
 
       if (this.mind) {
-        contextPromises.push(
-          this.mind.getContext(userId).then((ctx) => { mindContext = ctx }),
-        )
+        contextEntries.push({
+          promise: this.mind.getContext(userId).then((ctx) => { mindContext = ctx }),
+          context: 'mind.getContext',
+        })
       }
       if (this.emotional) {
-        contextPromises.push(
-          this.emotional.getContext(userId).then((ctx) => { emotionalContext = ctx }),
-        )
+        contextEntries.push({
+          promise: this.emotional.getContext(userId).then((ctx) => { emotionalContext = ctx }),
+          context: 'emotional.getContext',
+        })
       }
       if (this.social) {
-        contextPromises.push(
-          this.social.getContext(userId).then((ctx) => { socialContext = ctx }),
-        )
+        contextEntries.push({
+          promise: this.social.getContext(userId).then((ctx) => { socialContext = ctx }),
+          context: 'social.getContext',
+        })
       }
       if (this.planner) {
-        contextPromises.push(
-          this.planner.getContext(userId).then((ctx) => { planningContext = ctx }),
+        contextEntries.push({
+          promise: this.planner.getContext(userId).then((ctx) => { planningContext = ctx }),
+          context: 'planner.getContext',
+        })
+      }
+
+      if (contextEntries.length > 0) {
+        const results = await Promise.allSettled(
+          contextEntries.map((e) => e.promise),
         )
+        for (let i = 0; i < results.length; i++) {
+          this.unwrapSettled(results[i]!, contextEntries[i]!.context)
+        }
       }
 
-      if (contextPromises.length > 0) {
-        await Promise.all(contextPromises)
-      }
-
-      // ── Step 8: Temporal context ──
+      // ── Step 8: Temporal context (non-critical) ──
       let temporalContext: TemporalContext | undefined
 
       if (this.temporal) {
-        const recentEpisodes = episodicContext?.recentEpisodes ?? []
-        temporalContext = await this.temporal.getContext(userId, recentEpisodes)
+        try {
+          const recentEpisodes = episodicContext?.recentEpisodes ?? []
+          temporalContext = await this.temporal.getContext(userId, recentEpisodes)
+        } catch (error: unknown) {
+          this.onError(error, 'temporal.getContext')
+        }
       }
 
       // ── Step 9: Meta-assess ──
@@ -372,6 +400,22 @@ export class CognitiveOrchestrator {
   }
 
   // ── Private ──
+
+  /**
+   * Unwrap a settled promise result. Returns the value on success,
+   * logs and returns undefined on failure. Non-critical modules
+   * should never kill the pipeline.
+   */
+  private unwrapSettled<T>(
+    result: PromiseSettledResult<T>,
+    context: string,
+  ): T | undefined {
+    if (result.status === 'fulfilled') {
+      return result.value
+    }
+    this.onError(result.reason, context)
+    return undefined
+  }
 
   private async learn(
     userId: string,
