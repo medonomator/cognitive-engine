@@ -46,7 +46,7 @@ export class OpenAiLlmProvider implements LlmProvider {
     options?: LlmOptions,
   ): Promise<LlmResponse> {
     const params = this.buildParams(messages, options)
-    const response = await this.client.chat.completions.create(params) as OpenAI.ChatCompletion
+    const response = await this.client.chat.completions.create(params)
     return this.toResponse(response)
   }
 
@@ -57,11 +57,12 @@ export class OpenAiLlmProvider implements LlmProvider {
     const params = this.buildParams(messages, options)
     params.response_format = { type: 'json_object' }
 
-    const response = await this.client.chat.completions.create(params) as OpenAI.ChatCompletion
+    const response = await this.client.chat.completions.create(params)
     const base = this.toResponse(response)
 
     let parsed: T
     try {
+      // JSON.parse returns `any` — caller provides T based on their expected schema
       parsed = JSON.parse(base.content) as T
     } catch {
       throw new Error(
@@ -74,11 +75,11 @@ export class OpenAiLlmProvider implements LlmProvider {
   private buildParams(
     messages: LlmMessage[],
     options?: LlmOptions,
-  ): OpenAI.ChatCompletionCreateParams {
+  ): OpenAI.ChatCompletionCreateParamsNonStreaming {
     const model = options?.model ?? this.model
     const reasoning = isReasoningModel(model)
 
-    const params: OpenAI.ChatCompletionCreateParams = {
+    const params: OpenAI.ChatCompletionCreateParamsNonStreaming = {
       model,
       messages: this.toOpenAiMessages(messages, reasoning),
     }

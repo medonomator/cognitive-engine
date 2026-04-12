@@ -9,6 +9,7 @@ import type {
   MemoryConfig,
 } from '@cognitive-engine/core'
 import { cosineSimilarity, exponentialDecay } from '@cognitive-engine/math'
+import type { ResolvedMemoryConfig } from './types.js'
 
 const COLLECTION = 'episodes'
 const MS_PER_DAY = 1000 * 60 * 60 * 24
@@ -18,15 +19,11 @@ const CONSOLIDATION_AGE_DAYS = 30
 const FORGOTTEN_THRESHOLD = 0.1
 const MIN_ACCESS_TO_KEEP = 2
 const CONSOLIDATION_DECAY_FACTOR = 0.01
-
-interface ResolvedMemoryConfig {
-  decayLambda: number
-  scoringWeights: { relevance: number; recency: number; importance: number }
-  similarityThreshold: number
-  categories: string[]
-  maxRecentEpisodes: number
-  maxRelevantEpisodes: number
-}
+const POSITIVE_VALENCE_THRESHOLD = 0.3
+const NEGATIVE_VALENCE_THRESHOLD = -0.3
+const DEFAULT_RELEVANCE_SCORE = 0.5
+const FORGOTTEN_RECENCY_THRESHOLD = 0.1
+const CANDIDATE_MULTIPLIER = 3
 
 const DEFAULT_CONFIG: ResolvedMemoryConfig = {
   decayLambda: 0.03,
@@ -81,45 +78,13 @@ export class EpisodicMemory {
 
   /** Search episodes with semantic + temporal scoring. */
   async search(query: EpisodeQuery): Promise<EpisodeSearchResult[]> {
-    const now = Date.now()
-    const relevance = this.config.scoringWeights.relevance
-    const recency = this.config.scoringWeights.recency
-    const importance = this.config.scoringWeights.importance
-
-    // Fetch candidate episodes
     const candidates = await this.fetchCandidates(query)
-
-    // Compute relevance scores via embedding similarity
     const relevanceScores = await this.computeRelevanceScores(
       query.query,
       candidates,
     )
 
-    // Score and rank
-    const results: EpisodeSearchResult[] = []
-    for (const ep of candidates) {
-      const daysSince = (now - ep.occurredAt.getTime()) / MS_PER_DAY
-      const recencyScore = exponentialDecay(daysSince, ep.decayFactor)
-      const relevanceScore = relevanceScores.get(ep.id) ?? 0.5
-      const accessBoost = Math.min(ep.accessCount * ACCESS_BOOST_PER_VIEW, MAX_ACCESS_BOOST)
-      const importanceScore = Math.min(ep.importance + accessBoost, 1)
-
-      const combinedScore =
-        relevanceScore * relevance +
-        recencyScore * recency +
-        importanceScore * importance
-
-      // Skip "forgotten" episodes unless explicitly requested
-      if (!query.includeDecayed && recencyScore < 0.1) continue
-
-      results.push({
-        episode: ep,
-        relevanceScore,
-        recencyScore,
-        importanceScore,
-        combinedScore,
-      })
-    }
+    const results = this.scoreAndRank(candidates, relevanceScores, query.includeDecayed)
 
     results.sort((a, b) => b.combinedScore - a.combinedScore)
     return results.slice(0, query.limit ?? this.config.maxRelevantEpisodes)
@@ -212,6 +177,42 @@ export class EpisodicMemory {
 
   // ── Private ──
 
+  private scoreAndRank(
+    candidates: Episode[],
+    relevanceScores: Map<string, number>,
+    includeDecayed?: boolean,
+  ): EpisodeSearchResult[] {
+    const now = Date.now()
+    const { relevance, recency, importance } = this.config.scoringWeights
+    const results: EpisodeSearchResult[] = []
+
+    for (const ep of candidates) {
+      const daysSince = (now - ep.occurredAt.getTime()) / MS_PER_DAY
+      const recencyScore = exponentialDecay(daysSince, ep.decayFactor)
+
+      if (!includeDecayed && recencyScore < FORGOTTEN_RECENCY_THRESHOLD) continue
+
+      const relevanceScore = relevanceScores.get(ep.id) ?? DEFAULT_RELEVANCE_SCORE
+      const accessBoost = Math.min(ep.accessCount * ACCESS_BOOST_PER_VIEW, MAX_ACCESS_BOOST)
+      const importanceScore = Math.min(ep.importance + accessBoost, 1)
+
+      const combinedScore =
+        relevanceScore * relevance +
+        recencyScore * recency +
+        importanceScore * importance
+
+      results.push({
+        episode: ep,
+        relevanceScore,
+        recencyScore,
+        importanceScore,
+        combinedScore,
+      })
+    }
+
+    return results
+  }
+
   private async fetchCandidates(query: EpisodeQuery): Promise<Episode[]> {
     const where: Record<string, unknown> = { userId: query.userId }
     if (query.categories && query.categories.length > 0) {
@@ -221,38 +222,44 @@ export class EpisodicMemory {
     const episodes = await this.store.find<Episode>(COLLECTION, {
       where,
       orderBy: { occurredAt: 'desc' },
-      limit: (query.limit ?? this.config.maxRelevantEpisodes) * 3,
+      limit: (query.limit ?? this.config.maxRelevantEpisodes) * CANDIDATE_MULTIPLIER,
     })
 
-    return episodes.filter((ep) => {
-      if (
-        query.categories &&
-        query.categories.length > 0 &&
-        !query.categories.includes(ep.category)
-      ) {
-        return false
-      }
-      if (
-        query.emotions &&
-        query.emotions.length > 0 &&
-        !ep.emotions.some((e) => query.emotions!.includes(e))
-      ) {
-        return false
-      }
-      if (query.timeRange?.from && ep.occurredAt < query.timeRange.from) {
-        return false
-      }
-      if (query.timeRange?.to && ep.occurredAt > query.timeRange.to) {
-        return false
-      }
-      if (
-        query.minImportance !== undefined &&
-        ep.importance < query.minImportance
-      ) {
-        return false
-      }
-      return true
-    })
+    return episodes.filter((ep) => this.matchesQuery(ep, query))
+  }
+
+  private matchesQuery(ep: Episode, query: EpisodeQuery): boolean {
+    if (
+      query.categories &&
+      query.categories.length > 0 &&
+      !query.categories.includes(ep.category)
+    ) {
+      return false
+    }
+
+    const queryEmotions = query.emotions
+    if (
+      queryEmotions &&
+      queryEmotions.length > 0 &&
+      !ep.emotions.some((e) => queryEmotions.includes(e))
+    ) {
+      return false
+    }
+
+    if (query.timeRange?.from && ep.occurredAt < query.timeRange.from) {
+      return false
+    }
+    if (query.timeRange?.to && ep.occurredAt > query.timeRange.to) {
+      return false
+    }
+    if (
+      query.minImportance !== undefined &&
+      ep.importance < query.minImportance
+    ) {
+      return false
+    }
+
+    return true
   }
 
   private async computeRelevanceScores(
@@ -299,8 +306,8 @@ export class EpisodicMemory {
       }
     }
 
-    if (avgValence > 0.3) return `positive (${dominantEmotion})`
-    if (avgValence < -0.3) return `negative (${dominantEmotion})`
+    if (avgValence > POSITIVE_VALENCE_THRESHOLD) return `positive (${dominantEmotion})`
+    if (avgValence < NEGATIVE_VALENCE_THRESHOLD) return `negative (${dominantEmotion})`
     if (dominantEmotion !== 'neutral') return dominantEmotion
     return 'neutral'
   }

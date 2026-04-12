@@ -32,14 +32,16 @@ export class MemoryStore implements Store {
 
   async get<T>(collection: string, id: string): Promise<T | null> {
     const record = this.getCollection(collection).get(id)
+    // Generic store returns untyped data — caller provides T based on their schema knowledge
     return record ? (record.data as T) : null
   }
 
   async set<T>(collection: string, id: string, data: T): Promise<void> {
     const col = this.getCollection(collection)
+    const storeData = isRecord(data) ? data : { value: data }
     const record: StoredRecord = {
       id,
-      data: data as Record<string, unknown>,
+      data: storeData,
       vector: extractVector(data),
     }
     col.set(id, record)
@@ -87,6 +89,7 @@ export class MemoryStore implements Store {
       results = results.slice(0, filter.limit)
     }
 
+    // Generic store returns untyped data — caller provides T based on their schema knowledge
     return results.map((r) => r.data as T)
   }
 
@@ -149,6 +152,10 @@ export class MemoryStore implements Store {
 // Helpers
 // ═══════════════════════════════════════════
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
 function matchesWhere(
   data: Record<string, unknown>,
   where: Record<string, unknown>,
@@ -164,8 +171,8 @@ function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
   const parts = path.split('.')
   let current: unknown = obj
   for (const part of parts) {
-    if (current === null || current === undefined) return undefined
-    current = (current as Record<string, unknown>)[part]
+    if (!isRecord(current)) return undefined
+    current = current[part]
   }
   return current
 }
@@ -175,11 +182,10 @@ function isNumberArray(value: unknown): value is number[] {
 }
 
 function extractVector(data: unknown): number[] | undefined {
-  if (typeof data !== 'object' || data === null) return undefined
-  const record = data as Record<string, unknown>
-  const embedding = record['embedding']
+  if (!isRecord(data)) return undefined
+  const embedding = data['embedding']
   if (isNumberArray(embedding)) return embedding
-  const vector = record['vector']
+  const vector = data['vector']
   if (isNumberArray(vector)) return vector
   return undefined
 }

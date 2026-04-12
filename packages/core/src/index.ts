@@ -37,6 +37,11 @@ export type {
   EpisodeQuery,
   EpisodicContext,
   ConsolidationResult,
+  Fact,
+  FactSource,
+  FactSearchResult,
+  FactQuery,
+  SemanticContext,
   BehaviorPattern,
   CausalChain,
   FuturePrediction,
@@ -48,28 +53,58 @@ export type {
   OpenLoop,
   EmotionalTrigger,
   MindContext,
+  EmotionalState,
+  EmotionSnapshot,
+  EmotionalContext,
+  RapportState,
+  SocialBoundary,
+  CommunicationPreference,
+  SocialContext,
+  Plan,
+  PlanStep,
+  PlanningContext,
+  MetacognitiveAssessment,
+  MetacognitiveContradiction,
+  MetacognitiveStrategy,
+  MetacognitiveFlagType,
+  MetacognitiveFlag,
+  CognitiveResponse,
   InferenceRule,
 } from './types.js'
 
 // Config
+export { defaultErrorHandler } from './config.js'
 export type {
+  ErrorHandler,
+  UrgencyPattern,
+  QuickPatterns,
+  RelevanceWeights,
+  MemoryScoringWeights,
+  SemanticScoringWeights,
   PerceptionConfig,
   ReasoningConfig,
   MemoryConfig,
+  SemanticMemoryConfig,
   TemporalConfig,
   BanditConfig,
   MindConfig,
+  EmotionalModelConfig,
+  SocialModelConfig,
+  PlanningConfig,
+  MetacognitionConfig,
   EngineModules,
   EngineConfig,
 } from './config.js'
 
 // Events
-export type { CognitiveEventMap } from './events.js'
+export type {
+  CognitiveEventMap,
+  BeliefUpdateEvent,
+  PredictionResolvedEvent,
+  BanditChoiceEvent,
+  BanditRewardEvent,
+} from './events.js'
 export { CognitiveEventEmitter } from './events.js'
-
-// Pipeline
-export type { Middleware } from './pipeline.js'
-export { Pipeline } from './pipeline.js'
 
 // Utilities
 export { uid } from './uid.js'

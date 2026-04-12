@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { OpenAiLlmProvider } from './llm.js'
 import type { LlmMessage } from '@cognitive-engine/core'
+import type OpenAI from 'openai'
 
 // Mock OpenAI
 vi.mock('openai', () => {
@@ -15,6 +16,7 @@ vi.mock('openai', () => {
 
 async function getCreateMock(): Promise<ReturnType<typeof vi.fn>> {
   const mod = await import('openai')
+  // vitest module mock injection — no typed alternative
   return (mod as unknown as { __createMock: ReturnType<typeof vi.fn> })
     .__createMock
 }
@@ -107,12 +109,12 @@ describe('OpenAiLlmProvider', () => {
         { model: 'o1-mini' },
       )
 
-      const call = createMock.mock.calls[0]![0] as Record<string, unknown>
-      expect(call['max_completion_tokens']).toBeDefined()
-      expect(call['temperature']).toBeUndefined()
+      const call: OpenAI.ChatCompletionCreateParamsNonStreaming =
+        createMock.mock.calls[0]![0]
+      expect(call.max_completion_tokens).toBeDefined()
+      expect(call.temperature).toBeUndefined()
       // system → developer for reasoning models
-      const msgs = call['messages'] as Array<{ role: string }>
-      expect(msgs[0]!.role).toBe('developer')
+      expect(call.messages[0]!.role).toBe('developer')
     })
 
     it('maps finish_reason correctly', async () => {

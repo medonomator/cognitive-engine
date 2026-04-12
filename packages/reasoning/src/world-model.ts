@@ -7,6 +7,14 @@ const SOURCE_WEIGHTS: Record<BeliefSource, number> = {
   inferred: 0.4,
 }
 
+const CONFIDENCE_MAX = 0.99
+const CONFIDENCE_MIN = 0.01
+const CONFIDENCE_CONFIRM_BOOST = 0.1
+const CONFIDENCE_DELETION_THRESHOLD = 0.1
+const DEFAULT_WEAKEN_AMOUNT = 0.15
+const DECAY_RATE_INFERRED = 0.1
+const DECAY_RATE_DEFAULT = 0.05
+
 /**
  * Manages user beliefs (world model) with Bayesian confidence updates.
  */
@@ -49,20 +57,32 @@ export class WorldModel {
     )
 
     if (existing) {
-      const updated: Belief = {
-        ...existing,
-        confidence: this.updateConfidence(
-          existing.confidence,
-          candidate.confidence,
-          source,
-        ),
-        evidence: [...existing.evidence, `Updated at ${new Date().toISOString()}`],
-        updatedAt: new Date(),
-      }
-      this.beliefs.set(updated.id, updated)
-      return updated
+      return this.reinforceExistingBelief(existing, candidate, source)
     }
 
+    return this.createNewBelief(candidate, source)
+  }
+
+  private reinforceExistingBelief(
+    existing: Belief,
+    candidate: BeliefCandidate,
+    source: BeliefSource,
+  ): Belief {
+    const updated: Belief = {
+      ...existing,
+      confidence: this.updateConfidence(
+        existing.confidence,
+        candidate.confidence,
+        source,
+      ),
+      evidence: [...existing.evidence, `Updated at ${new Date().toISOString()}`],
+      updatedAt: new Date(),
+    }
+    this.beliefs.set(updated.id, updated)
+    return updated
+  }
+
+  private createNewBelief(candidate: BeliefCandidate, source: BeliefSource): Belief {
     const now = new Date()
     const belief: Belief = {
       id: uid('belief'),
@@ -85,17 +105,17 @@ export class WorldModel {
     if (!belief) return
     this.beliefs.set(beliefId, {
       ...belief,
-      confidence: Math.min(0.99, belief.confidence + 0.1),
+      confidence: Math.min(CONFIDENCE_MAX, belief.confidence + CONFIDENCE_CONFIRM_BOOST),
       updatedAt: new Date(),
     })
   }
 
   /** Weaken belief confidence. Auto-deletes if below threshold. */
-  weakenBelief(beliefId: string, amount = 0.15): void {
+  weakenBelief(beliefId: string, amount = DEFAULT_WEAKEN_AMOUNT): void {
     const belief = this.beliefs.get(beliefId)
     if (!belief) return
     const newConfidence = belief.confidence - amount
-    if (newConfidence < 0.1) {
+    if (newConfidence < CONFIDENCE_DELETION_THRESHOLD) {
       this.beliefs.delete(beliefId)
     } else {
       this.beliefs.set(beliefId, {
@@ -109,9 +129,9 @@ export class WorldModel {
   /** Apply periodic decay to inferred beliefs. */
   applyDecay(): void {
     for (const [id, belief] of this.beliefs) {
-      const decayRate = belief.source === 'inferred' ? 0.1 : 0.05
+      const decayRate = belief.source === 'inferred' ? DECAY_RATE_INFERRED : DECAY_RATE_DEFAULT
       const newConfidence = belief.confidence * (1 - decayRate)
-      if (newConfidence < 0.1) {
+      if (newConfidence < CONFIDENCE_DELETION_THRESHOLD) {
         this.beliefs.delete(id)
       } else {
         this.beliefs.set(id, { ...belief, confidence: newConfidence })
@@ -140,6 +160,6 @@ export class WorldModel {
   ): number {
     const weight = SOURCE_WEIGHTS[source]
     const updated = prior * (1 - weight) + newEvidence * weight
-    return Math.min(0.99, Math.max(0.01, updated))
+    return Math.min(CONFIDENCE_MAX, Math.max(CONFIDENCE_MIN, updated))
   }
 }

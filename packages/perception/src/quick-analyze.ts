@@ -1,4 +1,6 @@
-import type { Entity, ResponseMode, ConversationPhase } from '@cognitive-engine/core'
+import type { Entity, ResponseMode, ConversationPhase, QuickPatterns } from '@cognitive-engine/core'
+
+export type { QuickPatterns }
 
 export interface QuickAnalysisResult {
   emotionalTone: string
@@ -7,13 +9,6 @@ export interface QuickAnalysisResult {
   responseMode: ResponseMode
   entities: Entity[]
   conversationPhase: ConversationPhase
-}
-
-export interface QuickPatterns {
-  emotions?: Record<string, RegExp[]>
-  urgency?: Array<{ pattern: RegExp; score: number }>
-  requestTypes?: Record<string, RegExp[]>
-  responseMode?: Record<string, RegExp[]>
 }
 
 // ═══════════════════════════════════════════
@@ -71,6 +66,8 @@ const DEFAULT_RESPONSE_MODE_PATTERNS: Record<string, RegExp[]> = {
 // Entity extraction via regex
 // ═══════════════════════════════════════════
 
+const REGEX_ENTITY_CONFIDENCE = 0.9
+
 const ENTITY_PATTERNS: Array<{ type: string; pattern: RegExp }> = [
   { type: 'email', pattern: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g },
   { type: 'url', pattern: /https?:\/\/[^\s<>]+/g },
@@ -86,7 +83,7 @@ function extractEntities(text: string): Entity[] {
     const regex = new RegExp(pattern.source, pattern.flags)
     let match: RegExpExecArray | null
     while ((match = regex.exec(text)) !== null) {
-      entities.push({ type, value: match[0], confidence: 0.9 })
+      entities.push({ type, value: match[0], confidence: REGEX_ENTITY_CONFIDENCE })
     }
   }
   return entities
@@ -151,10 +148,14 @@ function detectResponseMode(
   return 'listening'
 }
 
+const EXPLORATION_THRESHOLD = 3
+const DEEP_DIVE_THRESHOLD = 8
+const CONCLUSION_THRESHOLD = 12
+
 function detectPhase(historyLength: number): ConversationPhase {
   if (historyLength === 0) return 'opening'
-  if (historyLength <= 3) return 'exploration'
-  if (historyLength <= 8) return 'deep_dive'
-  if (historyLength <= 12) return 'conclusion'
+  if (historyLength <= EXPLORATION_THRESHOLD) return 'exploration'
+  if (historyLength <= DEEP_DIVE_THRESHOLD) return 'deep_dive'
+  if (historyLength <= CONCLUSION_THRESHOLD) return 'conclusion'
   return 'follow_up'
 }

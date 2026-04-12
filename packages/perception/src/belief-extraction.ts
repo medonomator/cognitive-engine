@@ -51,6 +51,10 @@ function entityTypeToPredicate(type: string): string | undefined {
     concept: 'interested_in',
     event: 'mentioned_event',
     url: 'shared_url',
+    date: 'occurred_on',
+    time: 'scheduled_at',
+    phone: 'has_phone',
+    number: 'has_quantity',
   }
   return mapping[type]
 }

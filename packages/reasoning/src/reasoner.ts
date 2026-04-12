@@ -4,10 +4,23 @@ import type {
   ReasoningResult,
   ReasoningConfig,
   InferenceRule,
+  Belief,
 } from '@cognitive-engine/core'
 import { WorldModel } from './world-model.js'
 import { WorkingMemory } from './working-memory.js'
 import { generateIntentions, applyInferenceRules } from './intention-generator.js'
+
+const DEFAULT_MAX_WORKING_MEMORY = 50
+const CONFIDENCE_BASE = 0.5
+const CONFIDENCE_BELIEF_FACTOR = 0.02
+const CONFIDENCE_BELIEF_CAP = 0.2
+const CONFIDENCE_CLEAR_INTENTION_BOOST = 0.1
+const CONFIDENCE_FEW_INTENTIONS_BOOST = 0.1
+const CONFIDENCE_MAX = 0.95
+const HIGH_PRIORITY_THRESHOLD = 8
+const MAX_CONFLICTING_INTENTIONS = 3
+const MIN_BELIEFS_FOR_CONTEXT = 3
+const TARGET_PREVIEW_LENGTH = 50
 
 /**
  * BDI Reasoning Engine.
@@ -26,7 +39,7 @@ export class Reasoner {
 
   constructor(config: ReasoningConfig = {}) {
     this.worldModel = new WorldModel()
-    this.workingMemory = new WorkingMemory(config.maxWorkingMemory ?? 50)
+    this.workingMemory = new WorkingMemory(config.maxWorkingMemory ?? DEFAULT_MAX_WORKING_MEMORY)
     this.customRules = config.customRules ?? []
   }
 
@@ -34,50 +47,18 @@ export class Reasoner {
    * Main reasoning loop: perceive → reason → decide.
    */
   reason(percept: Percept): ReasoningResult {
-    // 1. Update working memory
     this.workingMemory.update(percept)
-
-    // 2. Apply inference rules
-    const beliefs = this.worldModel.getBeliefs()
-    const candidates = applyInferenceRules(
-      percept,
-      beliefs,
-      this.customRules,
-    )
-
-    // 3. Update world model with inferred beliefs
-    const newBeliefs = candidates.map((c) =>
-      this.worldModel.addBelief(c, 'inferred'),
-    )
-
-    // 4. Build cognitive state
-    const state: CognitiveState = {
-      beliefs: this.worldModel.getBeliefs(),
-      goals: [],
-      workingMemory: this.workingMemory.getItems(),
-      currentIntentions: [],
-      emotionalContext: percept.emotionalTone,
-      attentionFocus: percept.entities.map((e) => e.value),
-      lastUpdated: new Date(),
-    }
-
-    // 5. Generate intentions
+    const newBeliefs = this.inferBeliefs(percept)
+    const state = this.buildCognitiveState(percept)
     const intentions = generateIntentions(percept, state)
-
-    // 6. Generate hypotheses and questions
-    const hypotheses = this.generateHypotheses(percept)
-    const questionsToAsk = this.generateQuestions(percept, state)
-
-    // 7. Calculate confidence
-    const confidence = this.calculateConfidence(intentions, state)
 
     return {
       intentions,
       newBeliefs,
-      hypotheses,
-      questionsToAsk,
+      hypotheses: this.generateHypotheses(percept),
+      questionsToAsk: this.generateQuestions(percept, state),
       suggestedActions: [],
-      confidence,
+      confidence: this.calculateConfidence(intentions, state),
     }
   }
 
@@ -94,12 +75,26 @@ export class Reasoner {
     }
   }
 
-  private generateHypotheses(percept: Percept): string[] {
-    const hypotheses: string[] = []
-    for (const need of percept.implicitNeeds) {
-      hypotheses.push(`User might need ${need}`)
+  private inferBeliefs(percept: Percept): Belief[] {
+    const beliefs = this.worldModel.getBeliefs()
+    const candidates = applyInferenceRules(percept, beliefs, this.customRules)
+    return candidates.map((c) => this.worldModel.addBelief(c, 'inferred'))
+  }
+
+  private buildCognitiveState(percept: Percept): CognitiveState {
+    return {
+      beliefs: this.worldModel.getBeliefs(),
+      goals: [],
+      workingMemory: this.workingMemory.getItems(),
+      currentIntentions: [],
+      emotionalContext: percept.emotionalTone,
+      attentionFocus: percept.entities.map((e) => e.value),
+      lastUpdated: new Date(),
     }
-    return hypotheses
+  }
+
+  private generateHypotheses(percept: Percept): string[] {
+    return percept.implicitNeeds.map((need) => `User might need ${need}`)
   }
 
   private generateQuestions(
@@ -108,8 +103,7 @@ export class Reasoner {
   ): string[] {
     const questions: string[] = []
 
-    // If few beliefs, suggest asking for more context
-    if (state.beliefs.length < 3 && percept.requestType !== 'greeting') {
+    if (state.beliefs.length < MIN_BELIEFS_FOR_CONTEXT && percept.requestType !== 'greeting') {
       questions.push('What specific outcome are you looking for?')
     }
 
@@ -120,21 +114,18 @@ export class Reasoner {
     intentions: Array<{ priority: number }>,
     state: CognitiveState,
   ): number {
-    let confidence = 0.5
+    let confidence = CONFIDENCE_BASE
 
-    // More beliefs = more confident
-    confidence += Math.min(0.2, state.beliefs.length * 0.02)
+    confidence += Math.min(CONFIDENCE_BELIEF_CAP, state.beliefs.length * CONFIDENCE_BELIEF_FACTOR)
 
-    // Clear primary intention = more confident
-    if (intentions.length > 0 && intentions[0]!.priority >= 8) {
-      confidence += 0.1
+    if (intentions.length > 0 && intentions[0]!.priority >= HIGH_PRIORITY_THRESHOLD) {
+      confidence += CONFIDENCE_CLEAR_INTENTION_BOOST
     }
 
-    // Few conflicting intentions = more confident
-    if (intentions.length <= 3) {
-      confidence += 0.1
+    if (intentions.length <= MAX_CONFLICTING_INTENTIONS) {
+      confidence += CONFIDENCE_FEW_INTENTIONS_BOOST
     }
 
-    return Math.min(0.95, confidence)
+    return Math.min(CONFIDENCE_MAX, confidence)
   }
 }

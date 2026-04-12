@@ -5,20 +5,7 @@ import type {
   Episode,
 } from '@cognitive-engine/core'
 import { clamp } from '@cognitive-engine/math'
-
-interface ExtractionResult {
-  hasEpisode: boolean
-  summary: string
-  details: string
-  participants: string[]
-  location?: string
-  emotions: string[]
-  emotionalValence: number
-  emotionalIntensity: number
-  category: string
-  tags: string[]
-  importance: number
-}
+import type { EpisodeExtractionResult } from './types.js'
 
 const EXTRACTION_PROMPT = `Analyze the following message and determine if it contains a personal episode (event, experience, story).
 Respond ONLY with valid JSON (no markdown, no code blocks):
@@ -57,7 +44,7 @@ export class EpisodeExtractor {
     message: string,
     occurredAt?: Date,
   ): Promise<Episode | null> {
-    const response = await this.llm.completeJson<ExtractionResult>(
+    const response = await this.llm.completeJson<EpisodeExtractionResult>(
       [
         { role: 'system', content: EXTRACTION_PROMPT },
         { role: 'user', content: message },

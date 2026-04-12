@@ -1,6 +1,6 @@
 {
   "name": "@cognitive-engine/temporal",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Temporal reasoning: behavior patterns, causal chains, future predictions",
   "type": "module",
   "main": "./dist/index.js",
@@ -22,7 +22,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@cognitive-engine/core": "*"
+    "@cognitive-engine/core": "*",
+    "@cognitive-engine/math": "*"
   },
   "license": "Apache-2.0",
   "author": "Dmitry Zorin",

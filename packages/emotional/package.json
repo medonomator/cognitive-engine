@@ -1,0 +1,38 @@
+{
+  "name": "@cognitive-engine/emotional",
+  "version": "0.2.0",
+  "description": "Emotional model: VAD tracking, trajectory, volatility detection",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@cognitive-engine/core": "*"
+  },
+  "license": "Apache-2.0",
+  "author": "Dmitry Zorin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/medonomator/cognitive-engine.git",
+    "directory": "packages/emotional"
+  },
+  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/emotional",
+  "publishConfig": {
+    "access": "public"
+  }
+}

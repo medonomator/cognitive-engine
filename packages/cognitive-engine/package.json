@@ -1,6 +1,6 @@
 {
   "name": "cognitive-engine",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "TypeScript framework for building AI agents with cognitive capabilities — perception, memory, reasoning, and adaptive learning",
   "type": "module",
   "main": "./dist/index.js",
@@ -26,6 +26,13 @@
     "@cognitive-engine/perception": "*",
     "@cognitive-engine/bandit": "*",
     "@cognitive-engine/memory": "*",
+    "@cognitive-engine/mind": "*",
+    "@cognitive-engine/emotional": "*",
+    "@cognitive-engine/social": "*",
+    "@cognitive-engine/temporal": "*",
+    "@cognitive-engine/planning": "*",
+    "@cognitive-engine/metacognition": "*",
+    "@cognitive-engine/orchestrator": "*",
     "@cognitive-engine/reasoning": "*"
   },
   "license": "Apache-2.0",

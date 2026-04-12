@@ -1,6 +1,6 @@
 {
   "name": "@cognitive-engine/memory",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Episodic memory with decay, semantic search, and consolidation",
   "type": "module",
   "main": "./dist/index.js",

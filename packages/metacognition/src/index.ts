@@ -1,0 +1,6 @@
+export { MetacognitionService } from './metacognition-service.js'
+export { analyzeCoherence } from './coherence-analyzer.js'
+export { analyzeCognitiveLoad } from './cognitive-load-analyzer.js'
+export { detectContradictions } from './contradiction-detector.js'
+export { StrategyTracker } from './strategy-tracker.js'
+export type { AssessmentInput, ResolvedMetacognitionConfig } from './types.js'

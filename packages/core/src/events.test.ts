@@ -1,6 +1,34 @@
 import { describe, it, expect, vi } from 'vitest'
 import { CognitiveEventEmitter } from './events.js'
-import type { Percept } from './types.js'
+import type { Belief, Percept } from './types.js'
+
+function makePercept(overrides: Partial<Percept> = {}): Percept {
+  return {
+    rawText: '',
+    emotionalTone: 'neutral',
+    urgency: 0,
+    requestType: 'general',
+    responseMode: 'listening',
+    entities: [],
+    implicitNeeds: [],
+    conversationPhase: 'opening',
+    confidence: 1,
+    analysisMethod: 'quick',
+    ...overrides,
+  }
+}
+
+const testBelief: Belief = {
+  id: '1',
+  subject: 'test',
+  predicate: 'is',
+  object: 'valid',
+  confidence: 1,
+  source: 'explicit',
+  evidence: [],
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}
 
 describe('CognitiveEventEmitter', () => {
   it('calls registered handler on emit', () => {
@@ -8,7 +36,7 @@ describe('CognitiveEventEmitter', () => {
     const handler = vi.fn()
 
     emitter.on('perception:complete', handler)
-    const percept = { rawText: 'hello', emotionalTone: 'neutral' } as Percept
+    const percept = makePercept({ rawText: 'hello', emotionalTone: 'neutral' })
     emitter.emit('perception:complete', percept)
 
     expect(handler).toHaveBeenCalledWith(percept)
@@ -21,7 +49,7 @@ describe('CognitiveEventEmitter', () => {
 
     emitter.on('perception:complete', h1)
     emitter.on('perception:complete', h2)
-    emitter.emit('perception:complete', { rawText: 'test' } as Percept)
+    emitter.emit('perception:complete', makePercept({ rawText: 'test' }))
 
     expect(h1).toHaveBeenCalledTimes(1)
     expect(h2).toHaveBeenCalledTimes(1)
@@ -33,7 +61,7 @@ describe('CognitiveEventEmitter', () => {
 
     emitter.on('perception:complete', handler)
     emitter.off('perception:complete', handler)
-    emitter.emit('perception:complete', { rawText: 'test' } as Percept)
+    emitter.emit('perception:complete', makePercept({ rawText: 'test' }))
 
     expect(handler).not.toHaveBeenCalled()
   })
@@ -49,7 +77,7 @@ describe('CognitiveEventEmitter', () => {
     emitter.on('perception:complete', goodHandler)
 
     // Should not throw
-    emitter.emit('perception:complete', { rawText: 'test' } as Percept)
+    emitter.emit('perception:complete', makePercept({ rawText: 'test' }))
     expect(goodHandler).toHaveBeenCalledTimes(1)
   })
 
@@ -62,8 +90,8 @@ describe('CognitiveEventEmitter', () => {
     emitter.on('belief:added', h2)
 
     emitter.removeAllListeners('perception:complete')
-    emitter.emit('perception:complete', { rawText: 'test' } as Percept)
-    emitter.emit('belief:added', { id: '1' } as any)
+    emitter.emit('perception:complete', makePercept({ rawText: 'test' }))
+    emitter.emit('belief:added', testBelief)
 
     expect(h1).not.toHaveBeenCalled()
     expect(h2).toHaveBeenCalledTimes(1)
@@ -78,8 +106,8 @@ describe('CognitiveEventEmitter', () => {
     emitter.on('belief:added', h2)
 
     emitter.removeAllListeners()
-    emitter.emit('perception:complete', { rawText: 'test' } as Percept)
-    emitter.emit('belief:added', { id: '1' } as any)
+    emitter.emit('perception:complete', makePercept({ rawText: 'test' }))
+    emitter.emit('belief:added', testBelief)
 
     expect(h1).not.toHaveBeenCalled()
     expect(h2).not.toHaveBeenCalled()

@@ -7,22 +7,45 @@ import type {
   Reflection,
   OpenLoop,
 } from './types.js'
+import { defaultErrorHandler } from './config.js'
+import type { ErrorHandler } from './config.js'
 
 // ═══════════════════════════════════════════
 // Event system for extensibility
 // ═══════════════════════════════════════════
 
+export interface BeliefUpdateEvent {
+  current: Belief
+  previous: Belief
+}
+
+export interface PredictionResolvedEvent {
+  prediction: FuturePrediction
+  correct: boolean
+}
+
+export interface BanditChoiceEvent {
+  actionId: string
+  category: string
+  wasExploration: boolean
+}
+
+export interface BanditRewardEvent {
+  actionId: string
+  reward: number
+}
+
 export interface CognitiveEventMap {
   'perception:complete': Percept
   'belief:added': Belief
-  'belief:updated': { current: Belief; previous: Belief }
+  'belief:updated': BeliefUpdateEvent
   'episode:created': Episode
   'episode:decayed': Episode
   'pattern:detected': BehaviorPattern
   'prediction:created': FuturePrediction
-  'prediction:resolved': { prediction: FuturePrediction; correct: boolean }
-  'bandit:choice': { actionId: string; category: string; wasExploration: boolean }
-  'bandit:reward': { actionId: string; reward: number }
+  'prediction:resolved': PredictionResolvedEvent
+  'bandit:choice': BanditChoiceEvent
+  'bandit:reward': BanditRewardEvent
   'mind:reflection': Reflection
   'mind:openLoop': OpenLoop
 }
@@ -31,6 +54,11 @@ type EventHandler<T> = (data: T) => void
 
 export class CognitiveEventEmitter {
   private handlers = new Map<string, Set<EventHandler<unknown>>>()
+  private readonly onError: ErrorHandler
+
+  constructor(onError?: ErrorHandler) {
+    this.onError = onError ?? defaultErrorHandler
+  }
 
   on<K extends keyof CognitiveEventMap>(
     event: K,
@@ -58,8 +86,8 @@ export class CognitiveEventEmitter {
       for (const handler of set) {
         try {
           handler(data)
-        } catch {
-          // Event handlers should not throw — swallow silently
+        } catch (error: unknown) {
+          this.onError(error, `event.${String(event)}`)
         }
       }
     }
