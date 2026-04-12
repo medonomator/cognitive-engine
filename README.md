@@ -1,5 +1,9 @@
 # cognitive-engine
 
+[![npm version](https://img.shields.io/npm/v/cognitive-engine.svg)](https://www.npmjs.com/package/cognitive-engine)
+[![license](https://img.shields.io/npm/l/cognitive-engine.svg)](https://github.com/medonomator/cognitive-engine/blob/main/LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue.svg)](https://www.typescriptlang.org/)
+
 > Not just memory. A mind.
 
 Pure TypeScript library for building AI agents with real cognitive capabilities — perception, memory, reasoning, emotions, social awareness, and adaptive learning.
