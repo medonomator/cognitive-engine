@@ -1,7 +1,7 @@
 {
   "name": "cognitive-engine",
-  "version": "0.2.0",
-  "description": "TypeScript framework for building AI agents with cognitive capabilities — perception, memory, reasoning, and adaptive learning",
+  "version": "0.2.1",
+  "description": "TypeScript library for building AI agents with cognitive capabilities — perception, memory, reasoning, emotions, and adaptive learning",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,7 +12,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "build": "tsc",
