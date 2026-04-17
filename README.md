@@ -3,6 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/cognitive-engine.svg)](https://www.npmjs.com/package/cognitive-engine)
 [![license](https://img.shields.io/npm/l/cognitive-engine.svg)](https://github.com/medonomator/cognitive-engine/blob/main/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue.svg)](https://www.typescriptlang.org/)
+[![Docs](https://img.shields.io/badge/docs-vitepress-646cff.svg)](https://medonomator.github.io/cognitive-engine/)
 
 > Not just memory. A mind.
 
