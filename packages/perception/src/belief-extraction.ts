@@ -17,7 +17,7 @@ export function extractBeliefCandidates(percept: Percept): BeliefCandidate[] {
     })
   }
 
-  // Entities → beliefs
+  // Entities as beliefs
   for (const entity of percept.entities) {
     const predicate = entityTypeToPredicate(entity.type)
     if (predicate) {
@@ -30,7 +30,7 @@ export function extractBeliefCandidates(percept: Percept): BeliefCandidate[] {
     }
   }
 
-  // Implicit needs → beliefs
+  // Implicit needs as beliefs
   for (const need of percept.implicitNeeds) {
     candidates.push({
       subject: 'user',

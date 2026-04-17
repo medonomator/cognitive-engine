@@ -63,7 +63,7 @@ describe('oneHot', () => {
 
 describe('binValue', () => {
   it('bins values correctly', () => {
-    // bins: [5, 30] → 3 buckets: <5, 5-30, >30
+    // bins: [5, 30] -> 3 buckets: <5, 5-30, >30
     expect(binValue(2, [5, 30])).toEqual([1, 0, 0])
     expect(binValue(10, [5, 30])).toEqual([0, 1, 0])
     expect(binValue(50, [5, 30])).toEqual([0, 0, 1])

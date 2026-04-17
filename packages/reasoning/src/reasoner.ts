@@ -34,7 +34,7 @@ interface UserReasoningState {
  *
  * Orchestrates the reasoning loop:
  * 1. Update working memory from percept
- * 2. Apply inference rules → new belief candidates
+ * 2. Apply inference rules -> new belief candidates
  * 3. Update world model with new beliefs
  * 4. Generate intentions (BDI core)
  * 5. Calculate confidence
@@ -50,7 +50,7 @@ export class Reasoner {
   }
 
   /**
-   * Main reasoning loop: perceive → reason → decide.
+   * Main reasoning loop: perceive -> reason -> decide.
    */
   reason(userId: string, percept: Percept): ReasoningResult {
     const { worldModel, workingMemory } = this.getOrCreateState(userId)

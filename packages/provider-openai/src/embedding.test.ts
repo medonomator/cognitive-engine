@@ -14,7 +14,7 @@ vi.mock('openai', () => {
 
 async function getCreateMock(): Promise<ReturnType<typeof vi.fn>> {
   const mod = await import('openai')
-  // vitest module mock injection — no typed alternative
+  // vitest module mock injection, no typed alternative
   return (mod as unknown as { __embeddingsCreateMock: ReturnType<typeof vi.fn> })
     .__embeddingsCreateMock
 }

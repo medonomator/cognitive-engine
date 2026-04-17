@@ -62,7 +62,7 @@ export class OpenAiLlmProvider implements LlmProvider {
 
     let parsed: T
     try {
-      // JSON.parse returns `any` — caller provides T based on their expected schema
+      // JSON.parse returns `any`; caller provides T based on their expected schema
       parsed = JSON.parse(base.content) as T
     } catch {
       throw new Error(

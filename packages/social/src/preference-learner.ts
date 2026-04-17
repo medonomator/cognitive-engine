@@ -141,8 +141,6 @@ export class PreferenceLearner {
     return this.findByDimension(userId, dimension)
   }
 
-  // ── Private ──
-
   private async findByDimension(
     userId: string,
     dimension: string,

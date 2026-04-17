@@ -478,7 +478,7 @@ describe('MetacognitionService', () => {
       tracker.record('ask_clarifying_question')
       const flags = tracker.record('ask_clarifying_question')
 
-      // Only last 3: [proceed_normally, ask, ask] — not 3 identical
+      // Only last 3: [proceed_normally, ask, ask] - not 3 identical
       expect(flags).toHaveLength(0)
     })
   })
@@ -595,7 +595,7 @@ describe('MetacognitionService', () => {
         },
       }))
 
-      // intention_conflict with explicit boundary → high severity contradiction
+      // intention_conflict with explicit boundary -> high severity contradiction
       // boundary_risk doesn't fire (rawText doesn't contain "divorce")
       // so address_contradiction wins
       expect(result.suggestedStrategy).toBe('address_contradiction')

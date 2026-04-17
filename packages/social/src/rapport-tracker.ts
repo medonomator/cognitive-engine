@@ -92,8 +92,6 @@ export class RapportTracker {
     return this.store.get<RapportState>(COLLECTION, userId)
   }
 
-  // ── Private ──
-
   private createInitialState(
     userId: string,
     percept: Percept,

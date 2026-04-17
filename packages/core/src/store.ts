@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════
-// Store — persistence abstraction
-// ═══════════════════════════════════════════
-
 export interface StoreFilter {
   where?: Record<string, unknown>
   orderBy?: Record<string, 'asc' | 'desc'>
@@ -42,7 +38,7 @@ export interface Store {
 
   /**
    * Vector similarity search.
-   * Optional capability — not all stores support this.
+   * Optional capability - not all stores support this.
    * Use `supportsVectorSearch()` to check.
    */
   vectorSearch?(

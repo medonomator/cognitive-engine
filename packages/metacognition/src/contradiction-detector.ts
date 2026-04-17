@@ -43,7 +43,6 @@ function detectPerceptVsFacts(
     for (const fact of facts) {
       if (!fact.subject.toLowerCase().includes(entityLower)) continue
 
-      // Check if percept text might negate the fact
       const rawLower = input.percept.rawText.toLowerCase()
       const negations = ['not', "don't", "doesn't", 'never', 'no longer', "isn't", "aren't", "wasn't"]
       const factObjectLower = fact.object.toLowerCase()

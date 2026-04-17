@@ -36,7 +36,7 @@ Rules:
 - Return {"boundaries": []} if no boundaries detected`
 
 /**
- * Detects and tracks social boundaries — topics or areas
+ * Detects and tracks social boundaries - topics or areas
  * where the user signals discomfort.
  *
  * The agent should respect boundaries by avoiding or
@@ -70,7 +70,6 @@ export class BoundaryDetector {
       for (const boundary of response.parsed.boundaries ?? []) {
         if (!boundary.topic) continue
 
-        // Check for existing boundary on same topic
         const existing = await this.findByTopic(userId, boundary.topic)
         if (existing) {
           // Update sensitivity (increase only, never decrease)
@@ -134,8 +133,6 @@ export class BoundaryDetector {
   async remove(boundaryId: string): Promise<void> {
     await this.store.delete(COLLECTION, boundaryId)
   }
-
-  // ── Private ──
 
   private async findByTopic(
     userId: string,

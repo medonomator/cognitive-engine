@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════
-// LLM Provider — any language model
-// ═══════════════════════════════════════════
-
 export interface LlmMessage {
   role: 'system' | 'user' | 'assistant'
   content: string
@@ -44,10 +40,6 @@ export interface LlmProvider {
     options?: LlmOptions,
   ): Promise<LlmResponse & { parsed: T }>
 }
-
-// ═══════════════════════════════════════════
-// Embedding Provider — any embedding model
-// ═══════════════════════════════════════════
 
 export interface EmbeddingProvider {
   /** Embed a single text. Returns normalized vector. */

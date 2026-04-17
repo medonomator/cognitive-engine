@@ -44,7 +44,7 @@ Rules:
 /**
  * Generates and manages internal reflections about the user.
  *
- * Reflections are agent's "inner thoughts" — observations, questions,
+ * Reflections are agent's "inner thoughts" - observations, questions,
  * insights that inform future conversations.
  */
 export class ReflectionService {

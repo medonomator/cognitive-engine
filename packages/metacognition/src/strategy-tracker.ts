@@ -7,7 +7,7 @@ import type {
  * Tracks recent strategy selections to detect repetitive patterns.
  *
  * If the agent keeps choosing the same strategy (e.g. "ask_clarifying_question"
- * 5 times in a row), something is wrong — it's stuck in a loop.
+ * 5 times in a row), something is wrong - it's stuck in a loop.
  * This tracker detects that and flags it.
  */
 
@@ -40,7 +40,6 @@ export class StrategyTracker {
   private detectRepetition(): MetacognitiveFlag[] {
     if (this.history.length < REPETITION_THRESHOLD) return []
 
-    // Check if last N strategies are identical (and not 'proceed_normally')
     const recent = this.history.slice(-REPETITION_THRESHOLD)
     const allSame = recent.every((s) => s === recent[0])
 

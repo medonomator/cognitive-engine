@@ -39,7 +39,7 @@ export function sampleMVN(mu: number[], Sigma: number[][]): number[] {
  * Sample from multivariate normal with DIAGONAL covariance.
  * N(mu, diag(sigmaSquared))
  *
- * O(n) instead of O(n³) — critical optimization for Thompson Sampling.
+ * O(n) instead of O(n³) - critical optimization for Thompson Sampling.
  *
  * For n=1554: ~2,400,000x faster than full Cholesky.
  *

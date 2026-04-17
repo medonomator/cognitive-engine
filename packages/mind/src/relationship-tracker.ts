@@ -134,8 +134,6 @@ export class RelationshipTracker {
     return all.filter((r) => r.type === type)
   }
 
-  // ── Private ──
-
   private async findByName(
     userId: string,
     name: string,

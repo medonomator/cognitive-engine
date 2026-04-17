@@ -155,8 +155,6 @@ export class EmotionalModel {
     return EMOTION_VAD[emotion.toLowerCase()] ?? DEFAULT_VAD
   }
 
-  // ── Private ──
-
   private createInitialState(
     userId: string,
     emotion: string,

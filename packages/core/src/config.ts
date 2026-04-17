@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════
-// Error handling
-// ═══════════════════════════════════════════
-
 /** Callback for non-fatal errors that shouldn't break the response. */
 export type ErrorHandler = (error: unknown, context: string) => void
 
@@ -10,10 +6,6 @@ export const defaultErrorHandler: ErrorHandler = (error, context) => {
   const message = error instanceof Error ? error.message : String(error)
   console.error(`[cognitive-engine] ${context}: ${message}`)
 }
-
-// ═══════════════════════════════════════════
-// Extracted named types
-// ═══════════════════════════════════════════
 
 /** Single urgency pattern with its associated score. */
 export interface UrgencyPattern {
@@ -48,10 +40,6 @@ export interface QuickPatterns {
   requestTypes?: Record<string, RegExp[]>
   responseMode?: Record<string, RegExp[]>
 }
-
-// ═══════════════════════════════════════════
-// Configuration types for all modules
-// ═══════════════════════════════════════════
 
 export interface PerceptionConfig {
   /** Custom quick-analysis regex patterns (language-specific) */

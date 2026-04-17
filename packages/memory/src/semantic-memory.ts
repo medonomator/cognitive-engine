@@ -78,7 +78,6 @@ export class SemanticMemory {
       return
     }
 
-    // Check for contradictions (same subject+predicate, different object)
     await this.resolveConflicts(fact)
 
     await this.store.set(COLLECTION, fact.id, fact)
@@ -161,7 +160,7 @@ export class SemanticMemory {
       })
       relevantFacts = results.map((r) => r.fact)
     } else {
-      // No query — return top facts by confidence
+      // No query - return top facts by confidence
       const all = await this.store.find<Fact>(COLLECTION, {
         where: { userId },
       })
@@ -227,8 +226,6 @@ export class SemanticMemory {
       lastAccessed: new Date(),
     })
   }
-
-  // ── Private ──
 
   private async findExactMatch(
     userId: string,

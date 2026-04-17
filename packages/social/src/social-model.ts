@@ -76,8 +76,6 @@ export class SocialModel {
     }
   }
 
-  // ── Private ──
-
   private formatContext(
     rapport: SocialContext['rapport'],
     boundaries: SocialContext['boundaries'],

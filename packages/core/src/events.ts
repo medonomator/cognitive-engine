@@ -10,10 +10,6 @@ import type {
 import { defaultErrorHandler } from './config.js'
 import type { ErrorHandler } from './config.js'
 
-// ═══════════════════════════════════════════
-// Event system for extensibility
-// ═══════════════════════════════════════════
-
 export interface BeliefUpdateEvent {
   current: Belief
   previous: Belief

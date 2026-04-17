@@ -11,10 +11,6 @@ export interface QuickAnalysisResult {
   conversationPhase: ConversationPhase
 }
 
-// ═══════════════════════════════════════════
-// Default patterns (English + some Russian)
-// ═══════════════════════════════════════════
-
 const DEFAULT_EMOTION_PATTERNS: Record<string, RegExp[]> = {
   positive: [
     /\b(great|awesome|love|happy|excited|wonderful|amazing|fantastic|thank|glad)\b/i,
@@ -62,10 +58,6 @@ const DEFAULT_RESPONSE_MODE_PATTERNS: Record<string, RegExp[]> = {
   ],
 }
 
-// ═══════════════════════════════════════════
-// Entity extraction via regex
-// ═══════════════════════════════════════════
-
 const REGEX_ENTITY_CONFIDENCE = 0.9
 
 const ENTITY_PATTERNS: Array<{ type: string; pattern: RegExp }> = [
@@ -88,10 +80,6 @@ function extractEntities(text: string): Entity[] {
   }
   return entities
 }
-
-// ═══════════════════════════════════════════
-// Main quick analyze function
-// ═══════════════════════════════════════════
 
 export function quickAnalyze(
   text: string,

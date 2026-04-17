@@ -120,8 +120,6 @@ export class PatternDetector {
     }
   }
 
-  // ── Private ──
-
   private formatEpisodeSummaries(episodes: Episode[]): string {
     return episodes
       .map(

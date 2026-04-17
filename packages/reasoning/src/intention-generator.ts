@@ -103,10 +103,6 @@ function appendClarifyIntention(intentions: Intention[], state: CognitiveState):
   }
 }
 
-// ═══════════════════════════════════════════
-// Built-in inference rules
-// ═══════════════════════════════════════════
-
 const CONFIDENCE_PROBLEM_INFERENCE = 0.6
 const CONFIDENCE_CREATIVE_INFERENCE = 0.5
 const CONFIDENCE_SPEED_INFERENCE = 0.7

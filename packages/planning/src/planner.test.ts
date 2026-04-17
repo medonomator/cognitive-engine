@@ -139,7 +139,7 @@ describe('Planner', () => {
       const plannerB = new Planner(store, createMockLlm(makePlan('Goal B', 0.5)), config)
       await plannerB.detectAndCreate('user1', 'Goal B')
 
-      // Create third — should abandon lowest priority (B)
+      // Create third - should abandon lowest priority (B)
       const plannerC = new Planner(store, createMockLlm(makePlan('Goal C', 0.7)), config)
       await plannerC.detectAndCreate('user1', 'Goal C')
 

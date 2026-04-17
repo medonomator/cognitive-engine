@@ -19,7 +19,7 @@ function createMockLlm(): LlmProvider {
     finishReason: 'stop' as const,
   })
 
-  // The orchestrator uses LLM in many places — return reasonable defaults
+  // The orchestrator uses LLM in many places, return reasonable defaults
   const defaultJson = {
     // Perception quick analysis
     emotionalTone: 'neutral',
@@ -183,7 +183,7 @@ describe('CognitiveOrchestrator', () => {
 
     const response = await orchestrator.process('user1', 'Test')
 
-    // System prompt is a string — may be empty if no context
+    // System prompt is a string, may be empty if no context
     expect(typeof response.systemPrompt).toBe('string')
   })
 
@@ -286,7 +286,7 @@ describe('CognitiveOrchestrator', () => {
 
     await orchestrator.process('user1', 'Remember this moment')
 
-    // learn() runs in the background via void — wait briefly for it to complete
+    // learn() runs in the background via void - wait briefly for it to complete
     await vi.waitFor(() => {
       expect(receivedEpisodes.length).toBeGreaterThanOrEqual(1)
     })
@@ -322,13 +322,13 @@ describe('CognitiveOrchestrator', () => {
 
     const orchestrator = new CognitiveOrchestrator(config)
 
-    // Break the store — simulates DB/embedding failure
+    // Break the store to simulate DB/embedding failure
     const brokenStore = orchestrator.episodicMemory!
     vi.spyOn(brokenStore, 'getContext').mockRejectedValue(new Error('store unavailable'))
 
     const response = await orchestrator.process('user1', 'Hello despite failures')
 
-    // Pipeline completed — we got a response
+    // Pipeline completed - we got a response
     expect(response.suggestedResponse).toBe('This is a suggested response.')
     expect(response.percept.rawText).toBe('Hello despite failures')
     expect(response.reasoning).toBeDefined()

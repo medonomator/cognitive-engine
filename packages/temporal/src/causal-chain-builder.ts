@@ -43,7 +43,7 @@ Rules:
 - Return {"chains": []} if no clear causal chains found`
 
 /**
- * Identifies causal chains across episodes — "A caused B which led to C".
+ * Identifies causal chains across episodes - "A caused B which led to C".
  *
  * Helps the agent understand WHY things happen, not just WHAT happened.
  */
@@ -101,8 +101,6 @@ export class CausalChainBuilder {
       c.rootCause.toLowerCase().includes(normalized),
     )
   }
-
-  // ── Private ──
 
   private formatEpisodeSummaries(episodes: Episode[]): string {
     return episodes

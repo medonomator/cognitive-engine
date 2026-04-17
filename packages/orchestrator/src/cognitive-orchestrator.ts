@@ -52,7 +52,7 @@ function resolveModules(modules?: EngineModules): Required<EngineModules> {
 }
 
 /**
- * CognitiveOrchestrator — the master pipeline.
+ * CognitiveOrchestrator - the master pipeline.
  *
  * Ties all cognitive modules together into a single `process()` call:
  *
@@ -87,7 +87,7 @@ export class CognitiveOrchestrator {
   readonly planner: Planner | null
   readonly metacognition: MetacognitionService | null
 
-  /** Optional event emitter — null when events are not enabled (zero overhead). */
+  /** Optional event emitter, null when events are not enabled (zero overhead). */
   readonly events: CognitiveEventEmitter | null
 
   private readonly enabledModules: Required<EngineModules>
@@ -100,14 +100,14 @@ export class CognitiveOrchestrator {
     this.events = config.events ?? null
     this.enabledModules = resolveModules(config.modules)
 
-    // ── Core pipeline (always instantiated) ──
+    // Core pipeline (always instantiated)
     this.perception = new PerceptionService(config.llm, {
       ...config.perception,
       onError: config.onError ?? defaultErrorHandler,
     })
     this.reasoning = new Reasoner(config.reasoning)
 
-    // ── Memory ──
+    // Memory
     if (this.enabledModules.memory) {
       this.episodicMemory = new EpisodicMemory(
         config.store,
@@ -128,37 +128,37 @@ export class CognitiveOrchestrator {
       this.factExtractor = null
     }
 
-    // ── Mind ──
+    // Mind
     this.mind = this.enabledModules.mind
       ? new MindService(config.store, config.llm, config.mind)
       : null
 
-    // ── Emotional ──
+    // Emotional
     this.emotional = this.enabledModules.emotional
       ? new EmotionalModel(config.store, config.emotional)
       : null
 
-    // ── Social ──
+    // Social
     this.social = this.enabledModules.social
       ? new SocialModel(config.store, config.llm, config.social)
       : null
 
-    // ── Temporal ──
+    // Temporal
     this.temporal = this.enabledModules.temporal
       ? new TemporalEngine(config.store, config.llm, config.temporal)
       : null
 
-    // ── Bandit ──
+    // Bandit
     this.bandit = this.enabledModules.bandit
       ? new ThompsonBandit(new MemoryBanditStorage(), config.bandit)
       : null
 
-    // ── Planning ──
+    // Planning
     this.planner = this.enabledModules.planning
       ? new Planner(config.store, config.llm, config.planning)
       : null
 
-    // ── Metacognition ──
+    // Metacognition
     this.metacognition = this.enabledModules.metacognition
       ? new MetacognitionService(config.metacognition)
       : null
@@ -176,12 +176,12 @@ export class CognitiveOrchestrator {
     message: string,
   ): Promise<CognitiveResponse> {
     try {
-      // ── Step 1: Perceive ──
+      // Step 1: Perceive
       const perceptionResult = await this.perception.perceive(message)
       const percept = perceptionResult.percept
       this.events?.emit('perception:complete', percept)
 
-      // ── Step 2: Remember (parallel, non-critical) ──
+      // Step 2: Remember (parallel, non-critical)
       let episodicContext: EpisodicContext | undefined
       let semanticContext: SemanticContext | undefined
 
@@ -194,10 +194,10 @@ export class CognitiveOrchestrator {
         semanticContext = this.unwrapSettled(scResult, 'semanticMemory.getContext')
       }
 
-      // ── Step 3: Reason ──
+      // Step 3: Reason
       const reasoning = this.reasoning.reason(userId, percept)
 
-      // ── Step 4-7: Reflect, Feel, Socialize, Plan (parallel, non-critical) ──
+      // Step 4-7: Reflect, Feel, Socialize, Plan (parallel, non-critical)
       const parallelUpdates: Array<{ promise: Promise<unknown>; context: string }> = []
 
       if (this.mind) {
@@ -235,7 +235,7 @@ export class CognitiveOrchestrator {
         }
       }
 
-      // ── Gather contexts (parallel, non-critical) ──
+      // Gather contexts (parallel, non-critical)
       let mindContext: MindContext | undefined
       let emotionalContext: EmotionalContext | undefined
       let socialContext: SocialContext | undefined
@@ -277,7 +277,7 @@ export class CognitiveOrchestrator {
         }
       }
 
-      // ── Step 8: Temporal context (non-critical) ──
+      // Step 8: Temporal context (non-critical)
       let temporalContext: TemporalContext | undefined
 
       if (this.temporal) {
@@ -289,7 +289,7 @@ export class CognitiveOrchestrator {
         }
       }
 
-      // ── Step 9: Meta-assess ──
+      // Step 9: Meta-assess
       let metacognition: MetacognitiveAssessment | undefined
 
       if (this.metacognition) {
@@ -303,7 +303,7 @@ export class CognitiveOrchestrator {
         })
       }
 
-      // ── Step 10: Build system prompt ──
+      // Step 10: Build system prompt
       const systemPrompt = this.buildSystemPrompt(
         episodicContext,
         semanticContext,
@@ -315,7 +315,7 @@ export class CognitiveOrchestrator {
         metacognition,
       )
 
-      // ── Step 11: Generate suggested response ──
+      // Step 11: Generate suggested response
       const suggestedResponse = await this.generateResponse(
         systemPrompt,
         message,
@@ -324,7 +324,7 @@ export class CognitiveOrchestrator {
         metacognition,
       )
 
-      // ── Step 12: Learn (background, don't block response) ──
+      // Step 12: Learn (background, don't block response)
       if (this.episodicMemory && this.semanticMemory) {
         void this.learn(userId, message)
       }
@@ -398,8 +398,6 @@ export class CognitiveOrchestrator {
   ): void {
     this.events?.off(event, handler)
   }
-
-  // ── Private ──
 
   /**
    * Unwrap a settled promise result. Returns the value on success,

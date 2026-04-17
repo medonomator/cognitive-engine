@@ -138,8 +138,6 @@ export class Predictor {
     }
   }
 
-  // ── Private ──
-
   private async extractPredictions(
     context: string,
   ): Promise<{ parsed: PredictionExtractionResult }> {

@@ -31,7 +31,7 @@ Rules:
 - Return {"loops": []} if nothing to follow up on`
 
 /**
- * Detects and manages "open loops" — unresolved topics worth following up on.
+ * Detects and manages "open loops" - unresolved topics worth following up on.
  *
  * Open loops create the feeling of continuity: the agent remembers what
  * matters and checks back at the right time.
@@ -61,7 +61,6 @@ export class OpenLoopDetector {
       for (const l of response.parsed.loops ?? []) {
         if (!l.question || (l.importance ?? 0) < 0.3) continue
 
-        // Check for duplicate questions
         const isDuplicate = await this.isDuplicate(userId, l.question)
         if (isDuplicate) continue
 
@@ -171,7 +170,6 @@ export class OpenLoopDetector {
     return removed
   }
 
-  // ── Private ──
 
   private async isDuplicate(
     userId: string,

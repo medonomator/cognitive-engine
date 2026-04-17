@@ -175,8 +175,6 @@ export class EpisodicMemory {
     })
   }
 
-  // ── Private ──
-
   private scoreAndRank(
     candidates: Episode[],
     relevanceScores: Map<string, number>,
@@ -296,7 +294,6 @@ export class EpisodicMemory {
 
     const avgValence = totalValence / episodes.length
 
-    // Find dominant emotion
     let dominantEmotion = 'neutral'
     let maxCount = 0
     for (const [emotion, count] of emotionCounts) {

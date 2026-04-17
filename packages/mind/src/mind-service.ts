@@ -119,8 +119,6 @@ export class MindService {
     ])
   }
 
-  // ── Private ──
-
   private formatContext(
     reflections: MindContext['reflections'],
     relationships: MindContext['relationships'],

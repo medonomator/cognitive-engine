@@ -16,8 +16,6 @@ import { analyzeCognitiveLoad } from './cognitive-load-analyzer.js'
 import { detectContradictions } from './contradiction-detector.js'
 import { StrategyTracker } from './strategy-tracker.js'
 
-// ── Thresholds ──
-
 const LOW_CONFIDENCE_SEVERITY_BOUNDARY = 0.2
 const HIGH_EMOTIONAL_INTENSITY = 0.7
 
@@ -56,16 +54,16 @@ const DEFAULT_CONFIG: ResolvedMetacognitionConfig = {
 }
 
 /**
- * Metacognition — "thinking about thinking".
+ * Metacognition - "thinking about thinking".
  *
  * Evaluates the cognitive cycle quality through five lenses:
- * 1. **Signal flags** — low confidence, confusion, topic shift, emotional mismatch, boundary risk
- * 2. **Coherence** — intention conflicts, emotion/tone mismatch, fact contradictions
- * 3. **Cognitive load** — how many context layers are active simultaneously
- * 4. **Contradictions** — cross-layer conflicts (percept vs facts, intention vs boundary)
- * 5. **Strategy tracking** — detects repetitive strategy selection (agent stuck in loop)
+ * 1. **Signal flags** - low confidence, confusion, topic shift, emotional mismatch, boundary risk
+ * 2. **Coherence** - intention conflicts, emotion/tone mismatch, fact contradictions
+ * 3. **Cognitive load** - how many context layers are active simultaneously
+ * 4. **Contradictions** - cross-layer conflicts (percept vs facts, intention vs boundary)
+ * 5. **Strategy tracking** - detects repetitive strategy selection (agent stuck in loop)
  *
- * No LLM needed — works from signals already computed by other modules.
+ * No LLM needed - works from signals already computed by other modules.
  */
 export class MetacognitionService {
   private readonly config: ResolvedMetacognitionConfig
@@ -93,8 +91,6 @@ export class MetacognitionService {
 
     return this.buildAssessment(input, flags, knowledgeGaps, cognitiveLoad, contradictions)
   }
-
-  // ── Core Helpers ──
 
   private collectFlags(input: AssessmentInput): {
     flags: MetacognitiveFlag[]
@@ -146,8 +142,6 @@ export class MetacognitionService {
       flags,
     }
   }
-
-  // ── Signal Flags ──
 
   private detectSignalFlags(input: AssessmentInput): MetacognitiveFlag[] {
     const flags: MetacognitiveFlag[] = []
@@ -260,8 +254,6 @@ export class MetacognitionService {
     }
   }
 
-  // ── Scoring ──
-
   private assessUnderstanding(input: AssessmentInput): number {
     let score = UNDERSTANDING_BASE
     score += input.percept.confidence * UNDERSTANDING_PERCEPTION_WEIGHT
@@ -334,8 +326,6 @@ export class MetacognitionService {
     return clamp01(confidence)
   }
 
-  // ── Strategy Selection ──
-
   private selectStrategy(
     confidence: number,
     flags: MetacognitiveFlag[],
@@ -368,8 +358,6 @@ export class MetacognitionService {
     return 'proceed_normally'
   }
 }
-
-// ── Helpers ──
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value))

@@ -128,7 +128,6 @@ export class Planner {
       for (const step of plan.steps) {
         if (step.status !== 'pending') continue
 
-        // Check dependencies
         const depsComplete =
           !step.dependencies ||
           step.dependencies.every((d) => completedIds.has(d))
@@ -185,8 +184,6 @@ export class Planner {
 
     return { activePlans, nextActions, formattedContext }
   }
-
-  // ── Private ──
 
   private async extractPlan(message: string): Promise<PlanExtractionResult> {
     const response = await this.llm.completeJson<PlanExtractionResult>(

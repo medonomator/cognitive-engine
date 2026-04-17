@@ -56,7 +56,7 @@ export function oneHot(index: number, size: number): number[] {
  * Bin a continuous value into discrete buckets.
  * Returns one-hot vector of length bins.length + 1.
  *
- * Example: binValue(7, [5, 30]) → [0, 1, 0]
+ * Example: binValue(7, [5, 30]) -> [0, 1, 0]
  *   (7 falls into bin 1: ≥5 and <30)
  *
  * @param value - value to bin

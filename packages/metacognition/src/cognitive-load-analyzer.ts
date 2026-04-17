@@ -5,7 +5,7 @@ import type { AssessmentInput, ResolvedMetacognitionConfig } from './types.js'
  * Estimates cognitive load based on how many context layers are active.
  *
  * High cognitive load means the agent is juggling too many concerns
- * simultaneously — many active facts, episodes, emotions, boundaries,
+ * simultaneously - many active facts, episodes, emotions, boundaries,
  * and intentions. This can degrade response quality.
  */
 
@@ -20,7 +20,7 @@ const LOAD_WEIGHTS = {
   hypotheses: 0.10,
 } as const
 
-/** Saturation point per dimension — values above this don't increase load further. */
+/** Saturation point per dimension - values above this don't increase load further. */
 const SATURATION = {
   intentions: 5,
   relevantEpisodes: 8,

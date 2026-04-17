@@ -6,7 +6,7 @@
 
 > Not just memory. A mind.
 
-Pure TypeScript library for building AI agents with real cognitive capabilities — perception, memory, reasoning, emotions, social awareness, and adaptive learning.
+Pure TypeScript library for building AI agents with real cognitive capabilities - perception, memory, reasoning, emotions, social awareness, and adaptive learning.
 
 **Provider-agnostic**: works with any LLM and any storage backend via simple interfaces.
 
@@ -28,7 +28,7 @@ Most AI libraries just wrap API calls. Cognitive Engine gives your agent actual 
 
 | Module | What it does |
 |--------|-------------|
-| **Perception** | Dual-mode message analysis — emotions, urgency, intent, entities |
+| **Perception** | Dual-mode message analysis - emotions, urgency, intent, entities |
 | **Reasoning** | BDI (Beliefs-Desires-Intentions) with Bayesian belief updates |
 | **Episodic Memory** | Store & recall interactions with semantic search and natural forgetting |
 | **Semantic Memory** | Knowledge graph of facts with confidence tracking |
@@ -38,7 +38,7 @@ Most AI libraries just wrap API calls. Cognitive Engine gives your agent actual 
 | **Temporal** | Behavior patterns, causal chains, predictions |
 | **Planning** | Goal decomposition and plan tracking |
 | **Metacognition** | Self-assessment, contradiction detection, strategy selection |
-| **Bandit** | Thompson Sampling — learns what works per user |
+| **Bandit** | Thompson Sampling - learns what works per user |
 | **Orchestrator** | Composes all modules into a single `process()` call |
 
 ## Quick Start
@@ -74,7 +74,7 @@ const engine = new CognitiveOrchestrator({
   modules: {
     memory: true,
     emotional: true,
-    // everything else disabled — zero overhead
+    // everything else disabled - zero overhead
   },
 })
 ```
@@ -92,7 +92,7 @@ console.log(percept.urgency)      // 4
 
 ## Module Examples
 
-### Perception — Understand Messages
+### Perception - Understand Messages
 
 ```typescript
 const { percept, beliefCandidates } = await perception.perceive(
@@ -106,7 +106,7 @@ percept.implicitNeeds    // ['emotional_support', 'validation']
 percept.entities         // [{ type: 'person', value: 'manager' }]
 ```
 
-### Reasoning — Decide What To Do
+### Reasoning - Decide What To Do
 
 ```typescript
 const result = reasoner.reason(percept)
@@ -118,7 +118,7 @@ result.intentions
 // ]
 ```
 
-### Memory — Remember and Recall
+### Memory - Remember and Recall
 
 ```typescript
 // Store episodes
@@ -132,7 +132,7 @@ const results = await memory.search({ userId: 'user-123', query: 'team collabora
 const context = await memory.getContext('user-123', 'How is the project going?')
 ```
 
-### Bandit — Learn What Works
+### Bandit - Learn What Works
 
 ```typescript
 const bandit = new ThompsonBandit(new MemoryBanditStorage())
@@ -146,7 +146,7 @@ await bandit.update(choice.action, contextVector, 1.0)
 // Over time: learns per-context preferences
 ```
 
-### Events — React to Cognitive Activity
+### Events - React to Cognitive Activity
 
 ```typescript
 import { CognitiveEventEmitter, CognitiveOrchestrator } from 'cognitive-engine'
@@ -219,7 +219,7 @@ User Message
                ▼
 ┌──────────────────────┐
 │  Metacognition       │  Self-assessment
-│  → Strategy selection│
+│  -> Strategy selection│
 └──────────┬───────────┘
            │
            ▼
@@ -234,7 +234,7 @@ All packages work standalone. Use only what you need.
 
 | Package | Description |
 |---------|-------------|
-| `cognitive-engine` | Umbrella — re-exports everything |
+| `cognitive-engine` | Umbrella - re-exports everything |
 | `@cognitive-engine/core` | Types, interfaces, event system |
 | `@cognitive-engine/math` | Vector ops, statistics, sampling |
 | `@cognitive-engine/perception` | Message analysis |
@@ -253,12 +253,12 @@ All packages work standalone. Use only what you need.
 
 ## Design Principles
 
-- **Library, not framework** — you call it, it doesn't call you. Compose freely.
-- **Provider-agnostic** — swap LLM, embeddings, or storage via interfaces.
-- **Each module works standalone** — no hidden coupling between packages.
-- **Math-first** — real algorithms (Thompson Sampling, Bayesian updates, VAD model), not API wrappers.
-- **Strict TypeScript** — `strict: true`, zero `any` casts, all interfaces extracted.
-- **315+ tests** — every module tested, including convergence tests for bandit.
+- **Library, not framework** - you call it, it doesn't call you. Compose freely.
+- **Provider-agnostic** - swap LLM, embeddings, or storage via interfaces.
+- **Each module works standalone** - no hidden coupling between packages.
+- **Math-first** - real algorithms (Thompson Sampling, Bayesian updates, VAD model), not API wrappers.
+- **Strict TypeScript** - `strict: true`, zero `any` casts, all interfaces extracted.
+- **315+ tests** - every module tested, including convergence tests for bandit.
 
 ## Requirements
 
@@ -267,4 +267,4 @@ All packages work standalone. Use only what you need.
 
 ## License
 
-[Apache-2.0](https://github.com/medonomator/cognitive-engine/blob/main/LICENSE) — Copyright 2026 Dmitry Zorin
+[Apache-2.0](https://github.com/medonomator/cognitive-engine/blob/main/LICENSE) - Copyright 2026 Dmitry Zorin

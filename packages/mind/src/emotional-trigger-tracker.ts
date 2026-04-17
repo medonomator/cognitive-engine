@@ -10,10 +10,10 @@ const COLLECTION = 'emotional_triggers'
 const INTENSITY_SMOOTHING = 0.3
 
 /**
- * Tracks recurring emotional triggers — topics or situations that
+ * Tracks recurring emotional triggers - topics or situations that
  * consistently evoke strong emotions in the user.
  *
- * Does NOT use LLM — works from perception data already extracted.
+ * Does NOT use LLM - works from perception data already extracted.
  */
 export class EmotionalTriggerTracker {
   constructor(private readonly store: Store) {}
@@ -111,8 +111,6 @@ export class EmotionalTriggerTracker {
       (t) => t.emotion.toLowerCase() === emotion.toLowerCase(),
     )
   }
-
-  // ── Private ──
 
   private async findTrigger(
     userId: string,

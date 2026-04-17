@@ -54,7 +54,6 @@ export class WorkingMemory {
       })
     }
 
-    // Merge, sort by relevance, keep top N
     this.items = [...this.items, ...newItems]
       .sort((a, b) => b.relevance - a.relevance)
       .slice(0, this.maxItems)

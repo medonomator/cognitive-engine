@@ -16,7 +16,7 @@ vi.mock('openai', () => {
 
 async function getCreateMock(): Promise<ReturnType<typeof vi.fn>> {
   const mod = await import('openai')
-  // vitest module mock injection — no typed alternative
+  // vitest module mock injection, no typed alternative
   return (mod as unknown as { __createMock: ReturnType<typeof vi.fn> })
     .__createMock
 }
@@ -113,7 +113,7 @@ describe('OpenAiLlmProvider', () => {
         createMock.mock.calls[0]![0]
       expect(call.max_completion_tokens).toBeDefined()
       expect(call.temperature).toBeUndefined()
-      // system → developer for reasoning models
+      // system -> developer for reasoning models
       expect(call.messages[0]!.role).toBe('developer')
     })
 

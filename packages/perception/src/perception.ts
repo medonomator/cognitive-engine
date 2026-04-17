@@ -35,8 +35,8 @@ export class PerceptionService {
 
   /**
    * Analyze a message with dual-mode processing:
-   * - Short/simple messages → fast regex analysis only
-   * - Complex messages → regex + LLM deep analysis
+   * - Short/simple messages -> fast regex analysis only
+   * - Complex messages -> regex + LLM deep analysis
    */
   async perceive(
     text: string,

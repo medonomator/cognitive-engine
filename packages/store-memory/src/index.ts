@@ -32,7 +32,7 @@ export class MemoryStore implements Store {
 
   async get<T>(collection: string, id: string): Promise<T | null> {
     const record = this.getCollection(collection).get(id)
-    // Generic store returns untyped data — caller provides T based on their schema knowledge
+    // Generic store returns untyped data; caller provides T based on their schema knowledge
     return record ? (record.data as T) : null
   }
 
@@ -89,7 +89,7 @@ export class MemoryStore implements Store {
       results = results.slice(0, filter.limit)
     }
 
-    // Generic store returns untyped data — caller provides T based on their schema knowledge
+    // Generic store returns untyped data; caller provides T based on their schema knowledge
     return results.map((r) => r.data as T)
   }
 
@@ -147,10 +147,6 @@ export class MemoryStore implements Store {
     return total
   }
 }
-
-// ═══════════════════════════════════════════
-// Helpers
-// ═══════════════════════════════════════════
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
