@@ -38,7 +38,7 @@ function makePercept(overrides: Partial<Percept> = {}): Percept {
   }
 }
 
-// ── RapportTracker ──
+// RapportTracker
 
 describe('RapportTracker', () => {
   let store: MemoryStore
@@ -103,7 +103,7 @@ describe('RapportTracker', () => {
   })
 })
 
-// ── BoundaryDetector ──
+// BoundaryDetector
 
 describe('BoundaryDetector', () => {
   let store: MemoryStore
@@ -192,7 +192,7 @@ describe('BoundaryDetector', () => {
   })
 })
 
-// ── PreferenceLearner ──
+// PreferenceLearner
 
 describe('PreferenceLearner', () => {
   let store: MemoryStore
@@ -278,7 +278,7 @@ describe('PreferenceLearner', () => {
   })
 })
 
-// ── SocialModel ──
+// SocialModel
 
 describe('SocialModel', () => {
   let store: MemoryStore

@@ -68,7 +68,7 @@ function makeEpisode(overrides: Partial<Episode> = {}): Episode {
   }
 }
 
-// ── ReflectionService ──
+// ReflectionService
 
 describe('ReflectionService', () => {
   let store: MemoryStore
@@ -150,7 +150,7 @@ describe('ReflectionService', () => {
   })
 })
 
-// ── RelationshipTracker ──
+// RelationshipTracker
 
 describe('RelationshipTracker', () => {
   let store: MemoryStore
@@ -223,7 +223,7 @@ describe('RelationshipTracker', () => {
   })
 })
 
-// ── OpenLoopDetector ──
+// OpenLoopDetector
 
 describe('OpenLoopDetector', () => {
   let store: MemoryStore
@@ -349,7 +349,7 @@ describe('OpenLoopDetector', () => {
   })
 })
 
-// ── EmotionalTriggerTracker ──
+// EmotionalTriggerTracker
 
 describe('EmotionalTriggerTracker', () => {
   let store: MemoryStore
@@ -456,7 +456,7 @@ describe('EmotionalTriggerTracker', () => {
   })
 })
 
-// ── MindService ──
+// MindService
 
 describe('MindService', () => {
   let store: MemoryStore

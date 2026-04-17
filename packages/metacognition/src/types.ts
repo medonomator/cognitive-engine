@@ -17,7 +17,7 @@ export interface AssessmentInput {
   socialContext?: SocialContext
 }
 
-// ── Shared thresholds (used by multiple modules) ──
+// Shared thresholds (used by multiple modules)
 
 export const ENTITY_CONFIDENCE_THRESHOLD = 0.6
 export const HIGH_BOUNDARY_SENSITIVITY = 0.7

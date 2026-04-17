@@ -49,7 +49,7 @@ function makeEpisode(overrides: Partial<Episode> = {}): Episode {
   }
 }
 
-// ── PatternDetector ──
+// PatternDetector
 
 describe('PatternDetector', () => {
   let store: MemoryStore
@@ -196,7 +196,7 @@ describe('PatternDetector', () => {
   })
 })
 
-// ── CausalChainBuilder ──
+// CausalChainBuilder
 
 describe('CausalChainBuilder', () => {
   let store: MemoryStore
@@ -309,7 +309,7 @@ describe('CausalChainBuilder', () => {
   })
 })
 
-// ── Predictor ──
+// Predictor
 
 describe('Predictor', () => {
   let store: MemoryStore
@@ -443,7 +443,7 @@ describe('Predictor', () => {
   })
 })
 
-// ── TemporalEngine ──
+// TemporalEngine
 
 describe('TemporalEngine', () => {
   let store: MemoryStore

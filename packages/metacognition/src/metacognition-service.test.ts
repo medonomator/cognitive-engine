@@ -16,7 +16,7 @@ import { detectContradictions } from './contradiction-detector.js'
 import { StrategyTracker } from './strategy-tracker.js'
 import type { AssessmentInput } from './types.js'
 
-// ── Factories ──
+// Factories
 
 function makePercept(overrides: Partial<Percept> = {}): Percept {
   return {
@@ -146,7 +146,7 @@ function makeBoundary(topic: string, sensitivity: number, isExplicit: boolean) {
   }
 }
 
-// ── Tests ──
+// Tests
 
 describe('MetacognitionService', () => {
   describe('signal flags', () => {
