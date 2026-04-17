@@ -33,7 +33,10 @@
     "changeset": "changeset",
     "version": "changeset version",
     "release": "npm run build && changeset publish",
-    "docs": "typedoc"
+    "docs": "typedoc",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.6.0",
@@ -45,6 +48,7 @@
     "typedoc": "^0.28.18",
     "typedoc-plugin-markdown": "^4.11.0",
     "typescript": "^5.8.0",
+    "vitepress": "^1.6.4",
     "vitest": "^3.1.0"
   },
   "packageManager": "npm@10.0.0",
