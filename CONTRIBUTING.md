@@ -42,7 +42,6 @@ packages/
   orchestrator/     # CognitiveOrchestrator — wires all modules together
   bandit/           # Thompson Sampling for adaptive personalization
   store-memory/     # In-memory Store implementation (testing)
-  store-qdrant/     # Qdrant-backed persistent Store
   provider-openai/  # OpenAI LLM and embedding adapters
   cognitive-engine/ # Umbrella package re-exporting all modules
 ```
