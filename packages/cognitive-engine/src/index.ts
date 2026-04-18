@@ -106,7 +106,8 @@ export {
   uid,
 } from '@cognitive-engine/core'
 
-//Math utilitiesexport {
+// Math utilities
+export {
   l2Normalize,
   cosineSimilarity,
   dotProduct,
@@ -129,31 +130,44 @@ export {
   clamp,
 } from '@cognitive-engine/math'
 
-//Storeexport { MemoryStore } from '@cognitive-engine/store-memory'
+// Store
+export { MemoryStore } from '@cognitive-engine/store-memory'
 
-//OpenAI Providerexport { OpenAiLlmProvider, OpenAiEmbeddingProvider } from '@cognitive-engine/provider-openai'
+// OpenAI Provider
+export { OpenAiLlmProvider, OpenAiEmbeddingProvider } from '@cognitive-engine/provider-openai'
 export type { OpenAiLlmConfig, OpenAiEmbeddingConfig } from '@cognitive-engine/provider-openai'
 
-//Perceptionexport { PerceptionService, quickAnalyze, deepAnalyze, extractBeliefCandidates } from '@cognitive-engine/perception'
+// Perception
+export { PerceptionService, quickAnalyze, deepAnalyze, extractBeliefCandidates } from '@cognitive-engine/perception'
 export type { PerceptionResult, QuickAnalysisResult, QuickPatterns, DeepAnalysisResult } from '@cognitive-engine/perception'
 
-//Banditexport { ThompsonBandit, MemoryBanditStorage } from '@cognitive-engine/bandit'
+// Bandit
+export { ThompsonBandit, MemoryBanditStorage } from '@cognitive-engine/bandit'
 export type { BanditStorage } from '@cognitive-engine/bandit'
 
-//Memoryexport { EpisodicMemory, EpisodeExtractor, SemanticMemory, FactExtractor } from '@cognitive-engine/memory'
+// Memory
+export { EpisodicMemory, EpisodeExtractor, SemanticMemory, FactExtractor } from '@cognitive-engine/memory'
 
-//Mindexport { MindService, ReflectionService, RelationshipTracker, OpenLoopDetector, EmotionalTriggerTracker } from '@cognitive-engine/mind'
+// Mind
+export { MindService, ReflectionService, RelationshipTracker, OpenLoopDetector, EmotionalTriggerTracker } from '@cognitive-engine/mind'
 
-//Emotionalexport { EmotionalModel } from '@cognitive-engine/emotional'
+// Emotional
+export { EmotionalModel } from '@cognitive-engine/emotional'
 
-//Socialexport { SocialModel, RapportTracker, BoundaryDetector, PreferenceLearner } from '@cognitive-engine/social'
+// Social
+export { SocialModel, RapportTracker, BoundaryDetector, PreferenceLearner } from '@cognitive-engine/social'
 
-//Temporalexport { TemporalEngine, PatternDetector, CausalChainBuilder, Predictor } from '@cognitive-engine/temporal'
+// Temporal
+export { TemporalEngine, PatternDetector, CausalChainBuilder, Predictor } from '@cognitive-engine/temporal'
 
-//Planningexport { Planner } from '@cognitive-engine/planning'
+// Planning
+export { Planner } from '@cognitive-engine/planning'
 
-//Metacognitionexport { MetacognitionService } from '@cognitive-engine/metacognition'
+// Metacognition
+export { MetacognitionService } from '@cognitive-engine/metacognition'
 
-//Reasoningexport { Reasoner, WorldModel, WorkingMemory, generateIntentions, applyInferenceRules } from '@cognitive-engine/reasoning'
+// Reasoning
+export { Reasoner, WorldModel, WorkingMemory, generateIntentions, applyInferenceRules } from '@cognitive-engine/reasoning'
 
-//Orchestratorexport { CognitiveOrchestrator } from '@cognitive-engine/orchestrator'
+// Orchestrator
+export { CognitiveOrchestrator } from '@cognitive-engine/orchestrator'

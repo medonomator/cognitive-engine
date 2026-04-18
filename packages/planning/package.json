@@ -23,6 +23,9 @@
     "@cognitive-engine/core": "*",
     "@cognitive-engine/math": "*"
   },
+  "devDependencies": {
+    "@cognitive-engine/store-memory": "*"
+  },
   "license": "Apache-2.0",
   "author": "Dmitry Zorin",
   "repository": {
