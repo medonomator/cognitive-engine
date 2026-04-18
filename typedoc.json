@@ -1,0 +1,32 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPointStrategy": "packages",
+  "entryPoints": [
+    "packages/core",
+    "packages/math",
+    "packages/store-memory",
+    "packages/provider-openai",
+    "packages/perception",
+    "packages/bandit",
+    "packages/memory",
+    "packages/reasoning"
+  ],
+  "out": "docs",
+  "name": "Cognitive Engine",
+  "includeVersion": true,
+  "categorizeByGroup": true,
+  "searchInComments": true,
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+  "visibilityFilters": {
+    "protected": true,
+    "@internal": false
+  },
+  "exclude": ["**/*.test.ts", "**/*.spec.ts"],
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "githubPages": true,
+  "readme": "README.md"
+}

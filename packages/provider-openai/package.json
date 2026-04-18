@@ -1,6 +1,6 @@
 {
   "name": "@cognitive-engine/provider-openai",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "OpenAI LLM and embedding provider adapters",
   "type": "module",
   "main": "./dist/index.js",
@@ -11,7 +11,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
@@ -20,8 +22,18 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@cognitive-engine/core": "workspace:*",
+    "@cognitive-engine/core": "*",
     "openai": "^4.0.0"
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "author": "Dmitry Zorin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/medonomator/cognitive-engine.git",
+    "directory": "packages/provider-openai"
+  },
+  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/provider-openai",
+  "publishConfig": {
+    "access": "public"
+  }
 }
