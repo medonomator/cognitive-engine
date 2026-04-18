@@ -1,0 +1,44 @@
+{
+  "name": "@cognitive-engine/orchestrator",
+  "version": "0.2.0",
+  "description": "Master cognitive pipeline: orchestrates all modules into a unified cognitive cycle",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@cognitive-engine/core": "*",
+    "@cognitive-engine/perception": "*",
+    "@cognitive-engine/reasoning": "*",
+    "@cognitive-engine/memory": "*",
+    "@cognitive-engine/mind": "*",
+    "@cognitive-engine/emotional": "*",
+    "@cognitive-engine/social": "*",
+    "@cognitive-engine/temporal": "*",
+    "@cognitive-engine/bandit": "*",
+    "@cognitive-engine/planning": "*",
+    "@cognitive-engine/metacognition": "*"
+  },
+  "license": "Apache-2.0",
+  "author": "Dmitry Zorin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/medonomator/cognitive-engine.git",
+    "directory": "packages/orchestrator"
+  },
+  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/orchestrator",
+  "publishConfig": { "access": "public" }
+}

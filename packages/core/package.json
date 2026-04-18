@@ -1,0 +1,38 @@
+{
+  "name": "@cognitive-engine/core",
+  "version": "0.2.0",
+  "description": "Core types, interfaces, and engine orchestrator for cognitive engine",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@cognitive-engine/math": "*"
+  },
+  "license": "Apache-2.0",
+  "author": "Dmitry Zorin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/medonomator/cognitive-engine.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/core",
+  "publishConfig": {
+    "access": "public"
+  }
+}
