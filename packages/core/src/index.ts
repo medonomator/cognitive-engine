@@ -109,3 +109,4 @@ export { CognitiveEventEmitter } from './events.js'
 
 // Utilities
 export { uid } from './uid.js'
+export { mergeTrace } from './trace.js'

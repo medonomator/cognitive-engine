@@ -1,10 +1,11 @@
 import type {
   Store,
   LlmProvider,
+  LlmTraceContext,
   CausalChain,
   Episode,
 } from '@cognitive-engine/core'
-import { uid } from '@cognitive-engine/core'
+import { uid, mergeTrace } from '@cognitive-engine/core'
 import { clamp } from '@cognitive-engine/math'
 import type { CausalExtractionResult } from './types.js'
 
@@ -57,12 +58,13 @@ export class CausalChainBuilder {
   async build(
     userId: string,
     episodes: Episode[],
+    trace?: LlmTraceContext,
   ): Promise<CausalChain[]> {
     if (episodes.length < MIN_CHAIN_EVENTS) return []
 
     try {
       const summaries = this.formatEpisodeSummaries(episodes)
-      const response = await this.extractChains(summaries)
+      const response = await this.extractChains(userId, summaries, trace)
 
       return this.processExtractedChains(userId, response.parsed.chains ?? [])
     } catch (error: unknown) {
@@ -113,14 +115,24 @@ export class CausalChainBuilder {
   }
 
   private async extractChains(
+    userId: string,
     summaries: string,
+    trace?: LlmTraceContext,
   ): Promise<{ parsed: CausalExtractionResult }> {
     return this.llm.completeJson<CausalExtractionResult>(
       [
         { role: 'system', content: EXTRACTION_PROMPT },
         { role: 'user', content: summaries },
       ],
-      { temperature: LLM_TEMPERATURE, maxTokens: LLM_MAX_TOKENS },
+      {
+        temperature: LLM_TEMPERATURE,
+        maxTokens: LLM_MAX_TOKENS,
+        trace: mergeTrace(trace, {
+          userId,
+          generationName: 'temporal.causal-chains',
+          tags: ['temporal'],
+        }),
+      },
     )
   }
 

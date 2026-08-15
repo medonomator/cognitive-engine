@@ -1,12 +1,13 @@
 import type {
   Store,
   LlmProvider,
+  LlmTraceContext,
   FuturePrediction,
   BehaviorPattern,
   CausalChain,
   Episode,
 } from '@cognitive-engine/core'
-import { uid } from '@cognitive-engine/core'
+import { uid, mergeTrace } from '@cognitive-engine/core'
 import { clamp } from '@cognitive-engine/math'
 import type { PredictionExtractionResult } from './types.js'
 
@@ -64,6 +65,7 @@ export class Predictor {
     patterns: BehaviorPattern[],
     chains: CausalChain[],
     recentEpisodes: Episode[],
+    trace?: LlmTraceContext,
   ): Promise<FuturePrediction[]> {
     if (patterns.length === 0 && chains.length === 0 && recentEpisodes.length === 0) {
       return []
@@ -71,7 +73,7 @@ export class Predictor {
 
     try {
       const context = this.buildContext(patterns, chains, recentEpisodes)
-      const response = await this.extractPredictions(context)
+      const response = await this.extractPredictions(userId, context, trace)
 
       return this.processExtractedPredictions(userId, response.parsed.predictions ?? [])
     } catch (error: unknown) {
@@ -139,14 +141,24 @@ export class Predictor {
   }
 
   private async extractPredictions(
+    userId: string,
     context: string,
+    trace?: LlmTraceContext,
   ): Promise<{ parsed: PredictionExtractionResult }> {
     return this.llm.completeJson<PredictionExtractionResult>(
       [
         { role: 'system', content: EXTRACTION_PROMPT },
         { role: 'user', content: context },
       ],
-      { temperature: LLM_TEMPERATURE, maxTokens: LLM_MAX_TOKENS },
+      {
+        temperature: LLM_TEMPERATURE,
+        maxTokens: LLM_MAX_TOKENS,
+        trace: mergeTrace(trace, {
+          userId,
+          generationName: 'temporal.predictions',
+          tags: ['temporal'],
+        }),
+      },
     )
   }
 

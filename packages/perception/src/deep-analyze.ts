@@ -1,4 +1,9 @@
-import type { LlmProvider, Entity } from '@cognitive-engine/core'
+import type {
+  LlmProvider,
+  LlmTraceContext,
+  Entity,
+} from '@cognitive-engine/core'
+import { mergeTrace } from '@cognitive-engine/core'
 import { clamp } from '@cognitive-engine/math'
 
 export interface DeepAnalysisResult {
@@ -26,6 +31,7 @@ export async function deepAnalyze(
   conversationHistory: string[],
   llm: LlmProvider,
   customPrompt?: string,
+  trace?: LlmTraceContext,
 ): Promise<DeepAnalysisResult> {
   const systemPrompt = customPrompt ?? DEFAULT_PROMPT
 
@@ -38,7 +44,14 @@ export async function deepAnalyze(
       { role: 'system', content: systemPrompt },
       { role: 'user', content: `${text}${contextMessages}` },
     ],
-    { temperature: 0, maxTokens: 500 },
+    {
+      temperature: 0,
+      maxTokens: 500,
+      trace: mergeTrace(trace, {
+        generationName: 'perception.deep-analyze',
+        tags: ['perception'],
+      }),
+    },
   )
 
   return normalizeResult(response.parsed)

@@ -1,6 +1,7 @@
 import type {
   Store,
   LlmProvider,
+  LlmTraceContext,
   Percept,
   Episode,
   MindContext,
@@ -76,11 +77,12 @@ export class MindService {
     message: string,
     percept: Percept,
     recentEpisodes: Episode[],
+    trace?: LlmTraceContext,
   ): Promise<void> {
     await Promise.all([
-      this.reflections.generate(userId, percept, recentEpisodes),
-      this.relationships.extract(userId, message),
-      this.openLoops.detect(userId, message),
+      this.reflections.generate(userId, percept, recentEpisodes, trace),
+      this.relationships.extract(userId, message, trace),
+      this.openLoops.detect(userId, message, trace),
       this.emotionalTriggers.track(userId, percept),
     ])
   }

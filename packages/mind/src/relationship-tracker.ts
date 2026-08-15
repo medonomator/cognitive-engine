@@ -1,9 +1,10 @@
 import type {
   Store,
   LlmProvider,
+  LlmTraceContext,
   Relationship,
 } from '@cognitive-engine/core'
-import { uid } from '@cognitive-engine/core'
+import { uid, mergeTrace } from '@cognitive-engine/core'
 import { clamp } from '@cognitive-engine/math'
 import type { RelationshipExtractionResult } from './types.js'
 
@@ -45,7 +46,11 @@ export class RelationshipTracker {
   ) {}
 
   /** Extract and update relationships from a message. */
-  async extract(userId: string, message: string): Promise<Relationship[]> {
+  async extract(
+    userId: string,
+    message: string,
+    trace?: LlmTraceContext,
+  ): Promise<Relationship[]> {
     try {
       const response =
         await this.llm.completeJson<RelationshipExtractionResult>(
@@ -53,7 +58,15 @@ export class RelationshipTracker {
             { role: 'system', content: EXTRACTION_PROMPT },
             { role: 'user', content: message },
           ],
-          { temperature: 0, maxTokens: 300 },
+          {
+            temperature: 0,
+            maxTokens: 300,
+            trace: mergeTrace(trace, {
+              userId,
+              generationName: 'mind.relationships',
+              tags: ['mind'],
+            }),
+          },
         )
 
       const updated: Relationship[] = []

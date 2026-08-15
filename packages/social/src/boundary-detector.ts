@@ -1,9 +1,10 @@
 import type {
   Store,
   LlmProvider,
+  LlmTraceContext,
   SocialBoundary,
 } from '@cognitive-engine/core'
-import { uid } from '@cognitive-engine/core'
+import { uid, mergeTrace } from '@cognitive-engine/core'
 import { clamp } from '@cognitive-engine/math'
 import type { BoundaryExtractionResult } from './types.js'
 
@@ -53,6 +54,7 @@ export class BoundaryDetector {
   async detect(
     userId: string,
     message: string,
+    trace?: LlmTraceContext,
   ): Promise<SocialBoundary[]> {
     try {
       const response =
@@ -61,7 +63,15 @@ export class BoundaryDetector {
             { role: 'system', content: EXTRACTION_PROMPT },
             { role: 'user', content: message },
           ],
-          { temperature: 0, maxTokens: 300 },
+          {
+            temperature: 0,
+            maxTokens: 300,
+            trace: mergeTrace(trace, {
+              userId,
+              generationName: 'social.detect-boundaries',
+              tags: ['social'],
+            }),
+          },
         )
 
       const now = new Date()

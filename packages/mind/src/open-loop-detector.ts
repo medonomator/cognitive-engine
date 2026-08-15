@@ -1,5 +1,10 @@
-import type { Store, LlmProvider, OpenLoop } from '@cognitive-engine/core'
-import { uid } from '@cognitive-engine/core'
+import type {
+  Store,
+  LlmProvider,
+  LlmTraceContext,
+  OpenLoop,
+} from '@cognitive-engine/core'
+import { uid, mergeTrace } from '@cognitive-engine/core'
 import { clamp } from '@cognitive-engine/math'
 import type { OpenLoopExtractionResult } from './types.js'
 
@@ -44,7 +49,11 @@ export class OpenLoopDetector {
   ) {}
 
   /** Detect new open loops from a message. */
-  async detect(userId: string, message: string): Promise<OpenLoop[]> {
+  async detect(
+    userId: string,
+    message: string,
+    trace?: LlmTraceContext,
+  ): Promise<OpenLoop[]> {
     try {
       const response =
         await this.llm.completeJson<OpenLoopExtractionResult>(
@@ -52,7 +61,15 @@ export class OpenLoopDetector {
             { role: 'system', content: EXTRACTION_PROMPT },
             { role: 'user', content: message },
           ],
-          { temperature: 0, maxTokens: 300 },
+          {
+            temperature: 0,
+            maxTokens: 300,
+            trace: mergeTrace(trace, {
+              userId,
+              generationName: 'mind.detect-open-loops',
+              tags: ['mind'],
+            }),
+          },
         )
 
       const now = new Date()

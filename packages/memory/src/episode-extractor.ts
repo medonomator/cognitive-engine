@@ -1,6 +1,7 @@
-import { uid } from '@cognitive-engine/core'
+import { uid, mergeTrace } from '@cognitive-engine/core'
 import type {
   LlmProvider,
+  LlmTraceContext,
   EmbeddingProvider,
   Episode,
 } from '@cognitive-engine/core'
@@ -43,13 +44,22 @@ export class EpisodeExtractor {
     userId: string,
     message: string,
     occurredAt?: Date,
+    trace?: LlmTraceContext,
   ): Promise<Episode | null> {
     const response = await this.llm.completeJson<EpisodeExtractionResult>(
       [
         { role: 'system', content: EXTRACTION_PROMPT },
         { role: 'user', content: message },
       ],
-      { temperature: 0, maxTokens: 500 },
+      {
+        temperature: 0,
+        maxTokens: 500,
+        trace: mergeTrace(trace, {
+          userId,
+          generationName: 'memory.extract-episode',
+          tags: ['memory'],
+        }),
+      },
     )
 
     const result = response.parsed

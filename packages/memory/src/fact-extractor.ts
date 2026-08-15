@@ -1,6 +1,7 @@
-import { uid } from '@cognitive-engine/core'
+import { uid, mergeTrace } from '@cognitive-engine/core'
 import type {
   LlmProvider,
+  LlmTraceContext,
   EmbeddingProvider,
   Fact,
 } from '@cognitive-engine/core'
@@ -50,13 +51,25 @@ export class FactExtractor {
    * Analyze a message and extract facts.
    * Returns array of Fact objects (may be empty if no facts found).
    */
-  async extract(userId: string, message: string): Promise<Fact[]> {
+  async extract(
+    userId: string,
+    message: string,
+    trace?: LlmTraceContext,
+  ): Promise<Fact[]> {
     const response = await this.llm.completeJson<FactExtractionResult>(
       [
         { role: 'system', content: EXTRACTION_PROMPT },
         { role: 'user', content: message },
       ],
-      { temperature: 0, maxTokens: 500 },
+      {
+        temperature: 0,
+        maxTokens: 500,
+        trace: mergeTrace(trace, {
+          userId,
+          generationName: 'memory.extract-facts',
+          tags: ['memory'],
+        }),
+      },
     )
 
     const result = response.parsed
