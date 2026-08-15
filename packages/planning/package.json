@@ -1,6 +1,6 @@
 {
   "name": "@cognitive-engine/planning",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Goal decomposition, action planning, and plan execution tracking",
   "type": "module",
   "main": "./dist/index.js",
@@ -22,11 +22,11 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@cognitive-engine/core": "*",
-    "@cognitive-engine/math": "*"
+    "@cognitive-engine/core": "^0.4.1",
+    "@cognitive-engine/math": "^0.2.1"
   },
   "devDependencies": {
-    "@cognitive-engine/store-memory": "*"
+    "@cognitive-engine/store-memory": "^0.2.1"
   },
   "license": "Apache-2.0",
   "author": "Dmitry Zorin",

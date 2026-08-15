@@ -1,6 +1,6 @@
 {
   "name": "@cognitive-engine/metacognition",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Self-monitoring: confidence assessment, confusion detection, strategy selection",
   "type": "module",
   "main": "./dist/index.js",
@@ -11,7 +11,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
@@ -20,7 +22,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@cognitive-engine/core": "*"
+    "@cognitive-engine/core": "^0.4.1"
   },
   "license": "Apache-2.0",
   "author": "Dmitry Zorin",
@@ -30,5 +32,7 @@
     "directory": "packages/metacognition"
   },
   "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/metacognition",
-  "publishConfig": { "access": "public" }
+  "publishConfig": {
+    "access": "public"
+  }
 }

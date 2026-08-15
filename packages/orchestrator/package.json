@@ -1,6 +1,6 @@
 {
   "name": "@cognitive-engine/orchestrator",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Master cognitive pipeline: orchestrates all modules into a unified cognitive cycle",
   "type": "module",
   "main": "./dist/index.js",
@@ -22,17 +22,17 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@cognitive-engine/core": "*",
-    "@cognitive-engine/perception": "*",
-    "@cognitive-engine/reasoning": "*",
-    "@cognitive-engine/memory": "*",
-    "@cognitive-engine/mind": "*",
-    "@cognitive-engine/emotional": "*",
-    "@cognitive-engine/social": "*",
-    "@cognitive-engine/temporal": "*",
-    "@cognitive-engine/bandit": "*",
-    "@cognitive-engine/planning": "*",
-    "@cognitive-engine/metacognition": "*"
+    "@cognitive-engine/core": "^0.4.1",
+    "@cognitive-engine/perception": "^0.3.1",
+    "@cognitive-engine/reasoning": "^0.2.1",
+    "@cognitive-engine/memory": "^0.3.1",
+    "@cognitive-engine/mind": "^0.3.1",
+    "@cognitive-engine/emotional": "^0.2.1",
+    "@cognitive-engine/social": "^0.3.1",
+    "@cognitive-engine/temporal": "^0.3.1",
+    "@cognitive-engine/bandit": "^0.2.1",
+    "@cognitive-engine/planning": "^0.3.1",
+    "@cognitive-engine/metacognition": "^0.2.1"
   },
   "license": "Apache-2.0",
   "author": "Dmitry Zorin",
