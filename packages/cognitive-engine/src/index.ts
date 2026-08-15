@@ -4,6 +4,7 @@ export type {
   LlmProvider,
   LlmMessage,
   LlmOptions,
+  LlmTraceContext,
   LlmUsage,
   LlmResponse,
   EmbeddingProvider,

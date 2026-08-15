@@ -3,6 +3,29 @@ export interface LlmMessage {
   content: string
 }
 
+/**
+ * Vendor-neutral observability context for a single LLM call.
+ * Providers that talk to a tracing backend (Langfuse, LangSmith, OpenTelemetry)
+ * map these fields onto their own trace/span attributes. Providers without
+ * tracing ignore them.
+ */
+export interface LlmTraceContext {
+  /** Pre-generated trace id, so the caller can attach scores after the call */
+  traceId?: string
+  /** Name of the trace this call belongs to, e.g. 'assistant-chat' */
+  traceName?: string
+  /** Name of the generation inside the trace, e.g. 'reflection-pass' */
+  generationName?: string
+  /** Identity of the end user the call is made on behalf of */
+  userId?: string
+  /** Groups several calls of one conversation together */
+  sessionId?: string
+  /** Free-form labels for filtering, e.g. ['ai-assistant', 'digest'] */
+  tags?: string[]
+  /** Arbitrary structured context attached to the trace */
+  metadata?: Record<string, unknown>
+}
+
 export interface LlmOptions {
   /** Temperature (0-2). Default: 0 */
   temperature?: number
@@ -10,6 +33,8 @@ export interface LlmOptions {
   maxTokens?: number
   /** Override default model */
   model?: string
+  /** Observability context forwarded to the provider's tracing backend */
+  trace?: LlmTraceContext
 }
 
 export interface LlmUsage {
