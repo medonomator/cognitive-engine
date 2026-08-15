@@ -1,6 +1,6 @@
 {
   "name": "@cognitive-engine/store-memory",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "In-memory store adapter for testing and prototyping",
   "type": "module",
   "main": "./dist/index.js",
@@ -22,8 +22,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@cognitive-engine/core": "*",
-    "@cognitive-engine/math": "*"
+    "@cognitive-engine/core": "^0.4.1",
+    "@cognitive-engine/math": "^0.2.1"
   },
   "license": "Apache-2.0",
   "author": "Dmitry Zorin",

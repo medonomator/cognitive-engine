@@ -1,5 +1,28 @@
 # cognitive-engine
 
+## 0.4.1
+
+### Patch Changes
+
+- Pin internal package references to the exact version they were published with. They were shipped as the `*` range, so a consumer installing the umbrella package could resolve stale copies of the sub-packages and lose the newest API.
+
+- Updated dependencies []:
+  - @cognitive-engine/bandit@0.2.1
+  - @cognitive-engine/core@0.4.1
+  - @cognitive-engine/emotional@0.2.1
+  - @cognitive-engine/math@0.2.1
+  - @cognitive-engine/memory@0.3.1
+  - @cognitive-engine/metacognition@0.2.1
+  - @cognitive-engine/mind@0.3.1
+  - @cognitive-engine/orchestrator@0.3.1
+  - @cognitive-engine/perception@0.3.1
+  - @cognitive-engine/planning@0.3.1
+  - @cognitive-engine/provider-openai@0.2.1
+  - @cognitive-engine/reasoning@0.2.1
+  - @cognitive-engine/social@0.3.1
+  - @cognitive-engine/store-memory@0.2.1
+  - @cognitive-engine/temporal@0.3.1
+
 ## 0.4.0
 
 ### Minor Changes
