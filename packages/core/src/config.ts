@@ -1,3 +1,8 @@
+import type { InferenceRule } from './types.js'
+import type { LlmProvider, EmbeddingProvider } from './providers.js'
+import type { Store } from './store.js'
+import type { CognitiveEventEmitter } from './events.js'
+
 /** Callback for non-fatal errors that shouldn't break the response. */
 export type ErrorHandler = (error: unknown, context: string) => void
 
@@ -56,7 +61,7 @@ export interface ReasoningConfig {
   /** Maximum items in working memory. Default: 10 */
   maxWorkingMemory?: number
   /** Custom inference rules (run after built-in rules) */
-  customRules?: import('./types.js').InferenceRule[]
+  customRules?: InferenceRule[]
   /** Weights for relevance scoring */
   relevanceWeights?: RelevanceWeights
 }
@@ -172,9 +177,9 @@ export interface EngineModules {
 }
 
 export interface EngineConfig {
-  llm: import('./providers.js').LlmProvider
-  embedding: import('./providers.js').EmbeddingProvider
-  store: import('./store.js').Store
+  llm: LlmProvider
+  embedding: EmbeddingProvider
+  store: Store
 
   perception?: PerceptionConfig
   reasoning?: ReasoningConfig
@@ -199,5 +204,5 @@ export interface EngineConfig {
   onError?: ErrorHandler
 
   /** Optional event emitter for subscribing to cognitive events. */
-  events?: import('./events.js').CognitiveEventEmitter
+  events?: CognitiveEventEmitter
 }

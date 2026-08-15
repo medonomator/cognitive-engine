@@ -59,10 +59,10 @@ export class TemporalEngine {
     episodes: Episode[],
   ): Promise<void> {
     // Step 1: Detect patterns
-    const detectedPatterns = await this.patterns.detect(userId, episodes)
+    await this.patterns.detect(userId, episodes)
 
     // Step 2: Build causal chains
-    const chains = await this.causalChains.build(userId, episodes)
+    await this.causalChains.build(userId, episodes)
 
     // Step 3: Generate predictions from patterns + chains + episodes
     const allPatterns = await this.patterns.getActive(userId)
