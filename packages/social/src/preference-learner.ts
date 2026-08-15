@@ -1,9 +1,10 @@
 import type {
   Store,
   LlmProvider,
+  LlmTraceContext,
   CommunicationPreference,
 } from '@cognitive-engine/core'
-import { uid } from '@cognitive-engine/core'
+import { uid, mergeTrace } from '@cognitive-engine/core'
 import { clamp } from '@cognitive-engine/math'
 import type { PreferenceExtractionResult } from './types.js'
 
@@ -60,6 +61,7 @@ export class PreferenceLearner {
   async learn(
     userId: string,
     message: string,
+    trace?: LlmTraceContext,
   ): Promise<CommunicationPreference[]> {
     try {
       const response =
@@ -68,7 +70,15 @@ export class PreferenceLearner {
             { role: 'system', content: EXTRACTION_PROMPT },
             { role: 'user', content: message },
           ],
-          { temperature: 0, maxTokens: 300 },
+          {
+            temperature: 0,
+            maxTokens: 300,
+            trace: mergeTrace(trace, {
+              userId,
+              generationName: 'social.learn-preferences',
+              tags: ['social'],
+            }),
+          },
         )
 
       const updated: CommunicationPreference[] = []

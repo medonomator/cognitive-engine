@@ -1,5 +1,6 @@
 import type {
   LlmProvider,
+  LlmTraceContext,
   Percept,
   BeliefCandidate,
   PerceptionConfig,
@@ -41,6 +42,7 @@ export class PerceptionService {
   async perceive(
     text: string,
     conversationHistory: string[] = [],
+    trace?: LlmTraceContext,
   ): Promise<PerceptionResult> {
     const quick = quickAnalyze(
       text,
@@ -57,7 +59,7 @@ export class PerceptionService {
     }
 
     try {
-      return await this.buildDeepResult(text, conversationHistory, quick)
+      return await this.buildDeepResult(text, conversationHistory, quick, trace)
     } catch (error: unknown) {
       this.onError(error, 'perception.deepAnalysis')
       return this.buildFallbackResult(text, quick)
@@ -85,12 +87,14 @@ export class PerceptionService {
     text: string,
     conversationHistory: string[],
     quick: ReturnType<typeof quickAnalyze>,
+    trace?: LlmTraceContext,
   ): Promise<PerceptionResult> {
     const deep = await deepAnalyze(
       text,
       conversationHistory,
       this.llm,
       this.config.deepAnalysisPrompt,
+      trace,
     )
 
     const mergedEntities = deduplicateEntities([

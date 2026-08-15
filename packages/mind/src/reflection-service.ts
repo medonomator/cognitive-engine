@@ -1,11 +1,12 @@
 import type {
   Store,
   LlmProvider,
+  LlmTraceContext,
   Reflection,
   Percept,
   Episode,
 } from '@cognitive-engine/core'
-import { uid } from '@cognitive-engine/core'
+import { uid, mergeTrace } from '@cognitive-engine/core'
 import { clamp } from '@cognitive-engine/math'
 import type { ReflectionExtractionResult } from './types.js'
 
@@ -59,6 +60,7 @@ export class ReflectionService {
     userId: string,
     percept: Percept,
     recentEpisodes: Episode[],
+    trace?: LlmTraceContext,
   ): Promise<Reflection[]> {
     try {
       const episodesSummary = recentEpisodes
@@ -80,7 +82,15 @@ export class ReflectionService {
             { role: 'system', content: EXTRACTION_PROMPT },
             { role: 'user', content: context },
           ],
-          { temperature: EXTRACTION_TEMPERATURE, maxTokens: EXTRACTION_MAX_TOKENS },
+          {
+            temperature: EXTRACTION_TEMPERATURE,
+            maxTokens: EXTRACTION_MAX_TOKENS,
+            trace: mergeTrace(trace, {
+              userId,
+              generationName: 'mind.reflections',
+              tags: ['mind'],
+            }),
+          },
         )
 
       const now = new Date()

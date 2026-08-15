@@ -1,12 +1,13 @@
 import type {
   Store,
   LlmProvider,
+  LlmTraceContext,
   Plan,
   PlanStep,
   PlanningContext,
   PlanningConfig,
 } from '@cognitive-engine/core'
-import { uid } from '@cognitive-engine/core'
+import { uid, mergeTrace } from '@cognitive-engine/core'
 import { clamp } from '@cognitive-engine/math'
 import type { ResolvedPlanningConfig, PlanExtractionResult } from './types.js'
 
@@ -82,9 +83,10 @@ export class Planner {
   async detectAndCreate(
     userId: string,
     message: string,
+    trace?: LlmTraceContext,
   ): Promise<Plan | null> {
     try {
-      const result = await this.extractPlan(message)
+      const result = await this.extractPlan(userId, message, trace)
       if (!result.hasPlan || !result.goal) return null
 
       const existing = await this.findSimilar(userId, result.goal)
@@ -185,13 +187,25 @@ export class Planner {
     return { activePlans, nextActions, formattedContext }
   }
 
-  private async extractPlan(message: string): Promise<PlanExtractionResult> {
+  private async extractPlan(
+    userId: string,
+    message: string,
+    trace?: LlmTraceContext,
+  ): Promise<PlanExtractionResult> {
     const response = await this.llm.completeJson<PlanExtractionResult>(
       [
         { role: 'system', content: EXTRACTION_PROMPT },
         { role: 'user', content: message },
       ],
-      { temperature: LLM_TEMPERATURE, maxTokens: LLM_MAX_TOKENS },
+      {
+        temperature: LLM_TEMPERATURE,
+        maxTokens: LLM_MAX_TOKENS,
+        trace: mergeTrace(trace, {
+          userId,
+          generationName: 'planning.detect-plan',
+          tags: ['planning'],
+        }),
+      },
     )
     return response.parsed
   }

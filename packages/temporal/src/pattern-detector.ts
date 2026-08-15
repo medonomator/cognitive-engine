@@ -1,10 +1,11 @@
 import type {
   Store,
   LlmProvider,
+  LlmTraceContext,
   BehaviorPattern,
   Episode,
 } from '@cognitive-engine/core'
-import { uid } from '@cognitive-engine/core'
+import { uid, mergeTrace } from '@cognitive-engine/core'
 import { clamp } from '@cognitive-engine/math'
 import type { PatternExtractionResult } from './types.js'
 
@@ -63,6 +64,7 @@ export class PatternDetector {
   async detect(
     userId: string,
     episodes: Episode[],
+    trace?: LlmTraceContext,
   ): Promise<BehaviorPattern[]> {
     if (episodes.length < 2) return []
 
@@ -71,7 +73,7 @@ export class PatternDetector {
 
     try {
       const summaries = this.formatEpisodeSummaries(recentEpisodes)
-      const response = await this.extractPatterns(summaries)
+      const response = await this.extractPatterns(userId, summaries, trace)
 
       return this.processExtractedPatterns(userId, response.parsed.patterns ?? [])
     } catch (error: unknown) {
@@ -130,14 +132,24 @@ export class PatternDetector {
   }
 
   private async extractPatterns(
+    userId: string,
     summaries: string,
+    trace?: LlmTraceContext,
   ): Promise<{ parsed: PatternExtractionResult }> {
     return this.llm.completeJson<PatternExtractionResult>(
       [
         { role: 'system', content: EXTRACTION_PROMPT },
         { role: 'user', content: summaries },
       ],
-      { temperature: LLM_TEMPERATURE, maxTokens: LLM_MAX_TOKENS },
+      {
+        temperature: LLM_TEMPERATURE,
+        maxTokens: LLM_MAX_TOKENS,
+        trace: mergeTrace(trace, {
+          userId,
+          generationName: 'temporal.behavior-patterns',
+          tags: ['temporal'],
+        }),
+      },
     )
   }
 

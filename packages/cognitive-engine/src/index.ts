@@ -105,6 +105,7 @@ export {
   supportsVectorSearch,
   CognitiveEventEmitter,
   uid,
+  mergeTrace,
 } from '@cognitive-engine/core'
 
 // Math utilities

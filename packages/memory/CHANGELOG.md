@@ -1,6 +1,6 @@
-# @cognitive-engine/core
+# @cognitive-engine/memory
 
-## 0.4.0
+## 0.3.0
 
 ### Minor Changes
 
@@ -12,11 +12,7 @@
   context via the new `mergeTrace` helper, so a single conversation turn shows up as one
   trace in Langfuse or any other tracing backend.
 
-## 0.3.0
+### Patch Changes
 
-### Minor Changes
-
-- Add `LlmTraceContext` and `LlmOptions.trace` so callers can pass observability
-  context (traceId, traceName, generationName, userId, sessionId, tags, metadata)
-  down to a provider's tracing backend. Vendor-neutral: providers without tracing
-  ignore the field.
+- Updated dependencies []:
+  - @cognitive-engine/core@0.4.0

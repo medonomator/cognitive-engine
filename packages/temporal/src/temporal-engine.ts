@@ -1,6 +1,7 @@
 import type {
   Store,
   LlmProvider,
+  LlmTraceContext,
   Episode,
   TemporalContext,
   TemporalConfig,
@@ -57,18 +58,19 @@ export class TemporalEngine {
   async analyze(
     userId: string,
     episodes: Episode[],
+    trace?: LlmTraceContext,
   ): Promise<void> {
     // Step 1: Detect patterns
-    await this.patterns.detect(userId, episodes)
+    await this.patterns.detect(userId, episodes, trace)
 
     // Step 2: Build causal chains
-    await this.causalChains.build(userId, episodes)
+    await this.causalChains.build(userId, episodes, trace)
 
     // Step 3: Generate predictions from patterns + chains + episodes
     const allPatterns = await this.patterns.getActive(userId)
     const allChains = await this.causalChains.getAll(userId)
 
-    await this.predictor.predict(userId, allPatterns, allChains, episodes)
+    await this.predictor.predict(userId, allPatterns, allChains, episodes, trace)
   }
 
   /** Build temporal context for the reasoning layer. */

@@ -1,6 +1,6 @@
 {
   "name": "@cognitive-engine/planning",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Goal decomposition, action planning, and plan execution tracking",
   "type": "module",
   "main": "./dist/index.js",
@@ -11,7 +11,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
@@ -34,5 +36,7 @@
     "directory": "packages/planning"
   },
   "homepage": "https://github.com/medonomator/cognitive-engine/tree/main/packages/planning",
-  "publishConfig": { "access": "public" }
+  "publishConfig": {
+    "access": "public"
+  }
 }

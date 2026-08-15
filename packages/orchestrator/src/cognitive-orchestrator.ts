@@ -1,5 +1,6 @@
 import type {
   LlmProvider,
+  LlmTraceContext,
   EngineConfig,
   EngineModules,
   ErrorHandler,
@@ -16,7 +17,7 @@ import type {
   CognitiveResponse,
   CognitiveEventMap,
 } from '@cognitive-engine/core'
-import { defaultErrorHandler } from '@cognitive-engine/core'
+import { defaultErrorHandler, mergeTrace } from '@cognitive-engine/core'
 import type { CognitiveEventEmitter } from '@cognitive-engine/core'
 import { PerceptionService } from '@cognitive-engine/perception'
 import { Reasoner } from '@cognitive-engine/reasoning'
@@ -173,10 +174,15 @@ export class CognitiveOrchestrator {
   async process(
     userId: string,
     message: string,
+    trace?: LlmTraceContext,
   ): Promise<CognitiveResponse> {
     try {
       // Step 1: Perceive
-      const perceptionResult = await this.perception.perceive(message)
+      const perceptionResult = await this.perception.perceive(
+        message,
+        [],
+        trace,
+      )
       const percept = perceptionResult.percept
       this.events?.emit('perception:complete', percept)
 
@@ -202,7 +208,7 @@ export class CognitiveOrchestrator {
       if (this.mind) {
         const recentEpisodes = episodicContext?.recentEpisodes ?? []
         parallelUpdates.push({
-          promise: this.mind.process(userId, message, percept, recentEpisodes),
+          promise: this.mind.process(userId, message, percept, recentEpisodes, trace),
           context: 'mind.process',
         })
       }
@@ -214,13 +220,13 @@ export class CognitiveOrchestrator {
       }
       if (this.social) {
         parallelUpdates.push({
-          promise: this.social.process(userId, message, percept),
+          promise: this.social.process(userId, message, percept, trace),
           context: 'social.process',
         })
       }
       if (this.planner) {
         parallelUpdates.push({
-          promise: this.planner.detectAndCreate(userId, message),
+          promise: this.planner.detectAndCreate(userId, message, trace),
           context: 'planner.detectAndCreate',
         })
       }
@@ -320,12 +326,14 @@ export class CognitiveOrchestrator {
         message,
         percept,
         reasoning,
+        userId,
         metacognition,
+        trace,
       )
 
       // Step 12: Learn (background, don't block response)
       if (this.episodicMemory && this.semanticMemory) {
-        void this.learn(userId, message)
+        void this.learn(userId, message, trace)
       }
 
       return {
@@ -417,11 +425,12 @@ export class CognitiveOrchestrator {
   private async learn(
     userId: string,
     message: string,
+    trace?: LlmTraceContext,
   ): Promise<void> {
     try {
       const [episode, facts] = await Promise.all([
-        this.episodeExtractor!.extract(userId, message),
-        this.factExtractor!.extract(userId, message),
+        this.episodeExtractor!.extract(userId, message, undefined, trace),
+        this.factExtractor!.extract(userId, message, trace),
       ])
 
       if (episode) {
@@ -522,7 +531,9 @@ export class CognitiveOrchestrator {
     userMessage: string,
     percept: Percept,
     reasoning: ReasoningResult,
+    userId: string,
     meta?: MetacognitiveAssessment,
+    trace?: LlmTraceContext,
   ): Promise<string> {
     const intentionsSummary = reasoning.intentions
       .map((i) => `${i.type}: ${i.target}`)
@@ -550,7 +561,15 @@ export class CognitiveOrchestrator {
         { role: 'system', content: prompt },
         { role: 'user', content: userMessage },
       ],
-      { temperature: RESPONSE_TEMPERATURE, maxTokens: RESPONSE_MAX_TOKENS },
+      {
+        temperature: RESPONSE_TEMPERATURE,
+        maxTokens: RESPONSE_MAX_TOKENS,
+        trace: mergeTrace(trace, {
+          userId,
+          generationName: 'orchestrator.response',
+          tags: ['orchestrator'],
+        }),
+      },
     )
 
     return response.content

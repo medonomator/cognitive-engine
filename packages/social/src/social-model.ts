@@ -1,6 +1,7 @@
 import type {
   Store,
   LlmProvider,
+  LlmTraceContext,
   Percept,
   SocialContext,
   SocialModelConfig,
@@ -46,11 +47,12 @@ export class SocialModel {
     userId: string,
     message: string,
     percept: Percept,
+    trace?: LlmTraceContext,
   ): Promise<void> {
     await Promise.all([
       this.rapport.update(userId, percept, message.length),
-      this.boundaries.detect(userId, message),
-      this.preferences.learn(userId, message),
+      this.boundaries.detect(userId, message, trace),
+      this.preferences.learn(userId, message, trace),
     ])
   }
 
