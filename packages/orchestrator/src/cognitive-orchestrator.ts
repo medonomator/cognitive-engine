@@ -1,7 +1,5 @@
 import type {
   LlmProvider,
-  EmbeddingProvider,
-  Store,
   EngineConfig,
   EngineModules,
   ErrorHandler,
@@ -18,7 +16,8 @@ import type {
   CognitiveResponse,
   CognitiveEventMap,
 } from '@cognitive-engine/core'
-import { defaultErrorHandler, CognitiveEventEmitter } from '@cognitive-engine/core'
+import { defaultErrorHandler } from '@cognitive-engine/core'
+import type { CognitiveEventEmitter } from '@cognitive-engine/core'
 import { PerceptionService } from '@cognitive-engine/perception'
 import { Reasoner } from '@cognitive-engine/reasoning'
 import { EpisodicMemory, EpisodeExtractor, SemanticMemory, FactExtractor } from '@cognitive-engine/memory'

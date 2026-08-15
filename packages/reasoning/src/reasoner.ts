@@ -20,7 +20,6 @@ const CONFIDENCE_MAX = 0.95
 const HIGH_PRIORITY_THRESHOLD = 8
 const MAX_CONFLICTING_INTENTIONS = 3
 const MIN_BELIEFS_FOR_CONTEXT = 3
-const TARGET_PREVIEW_LENGTH = 50
 
 interface UserReasoningState {
   worldModel: WorldModel
